@@ -2,7 +2,8 @@ import { CanvasContext } from "#canvas-context.tsx";
 import { CanvasView } from "#canvas-view.tsx";
 import { ThreeScene } from "#three-scene.tsx";
 import { useState } from "react";
-import { SpinnyCube, SpinnyCubeTexture } from "./examples/spinny-cube";
+import { SpinnyCube } from "./examples/spinny-cube";
+import { SpinnyStar } from "./examples/spinny-star";
 
 function App() {
   const [toggle, setToggle] = useState(true);
@@ -42,7 +43,7 @@ function App() {
               <SpinnyCube position={[0, 2, 0]} />
               <SpinnyCube position={[2, 2, 0]} />
             </ThreeScene>
-            <SpinnyCubeTexture />
+            <SpinnyStar />
           </CanvasView>
         </CanvasContext>
       )}

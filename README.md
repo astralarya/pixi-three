@@ -26,7 +26,7 @@ Pixi-Three assumes the `hidden` Tailwind class is available. If not, you may see
     <ThreeScene>
       <SpinnyCube /> // Three.js Object
     </ThreeScene>
-    <SpinnySprite /> // Pixi.js Sprite
+    <SpinnyStar /> // Pixi.js Graphic
   </CanvasView>
 </CanvasContext>
 ```
