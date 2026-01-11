@@ -221,7 +221,14 @@ function CanvasViewContent({
     });
   }
 
-  useEffect(render);
+  // HOPE useEffectEvent
+  // const renderEffect = useEffectEvent(render);
+  // useEffect(() => {
+  //   if (app.isInitialised) {
+  //     renderEffect();
+  //   }
+  // }, [app.isInitialised]);
+  // END HOPE
 
   useTick({
     callback: render,
