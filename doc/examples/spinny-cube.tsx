@@ -17,7 +17,6 @@ export function SpinnyCube(props: ThreeElements["mesh"]) {
   const ref = useRef<Mesh>(null);
   const [hovered, hover] = useState(false);
   const [clicked, click] = useState(false);
-  console.log(clicked);
 
   useFrame((_state, delta) => {
     ref.current!.rotation.x += delta * (hovered ? 0.2 : 1);
@@ -27,7 +26,7 @@ export function SpinnyCube(props: ThreeElements["mesh"]) {
   const pixiTexture = useRef<TextureNode>(null!);
   const containerRef = useRef<Container>(null!);
   const eventHandlers = usePixiTextureEvents(containerRef, {
-    onClick: () => click((x) => !x),
+    onPointerDown: () => click((x) => !x),
     onPointerOver: () => hover(true),
     onPointerOut: () => hover(false),
   });
