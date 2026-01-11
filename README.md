@@ -5,7 +5,7 @@ Write declarative apps seamlessly blending 2d and 3d components in React.
 ## Installation
 
 ```bash
-npm install @astralarium/pixi-three @pixi/react @react-three/fiber pixi.js three
+npm install @astralarium/pixi-three https://pkg.pr.new/pixijs/pixijs/pixi.js@11816 @pixi/react @react-three/fiber three
 ```
 
 Pixi-Three assumes the `hidden` Tailwind class is available. If not, you may see an extra canvas.
