@@ -21,7 +21,20 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "pixi-three",
+      formats: ["es"],
+    },
+    rollupOptions: {
+      external: [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "three",
+        "pixi.js",
+        "@pixi/react",
+        "@react-three/fiber",
+        "its-fine",
+        "tunnel-rat",
+      ],
     },
   },
 });

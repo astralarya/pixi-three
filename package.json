@@ -19,6 +19,9 @@
     "url": "https://github.com/astralarya/pixi-three/issues"
   },
   "homepage": "https://github.com/astralarya/pixi-three#readme",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -34,17 +37,15 @@
   "imports": {
     "#*": "./src/*"
   },
-  "dependencies": {
-    "its-fine": "^2.0.0",
-    "tunnel-rat": "^0.1.2"
-  },
   "peerDependencies": {
     "@pixi/react": "^8.0.5",
     "@react-three/fiber": "^9.5.0",
+    "its-fine": "^2.0.0",
     "pixi.js": "*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "three": "^0.180.0"
+    "three": "^0.180.0",
+    "tunnel-rat": "^0.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -61,11 +62,13 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "its-fine": "^2.0.0",
     "pixi.js": "https://pkg.pr.new/pixijs/pixijs/pixi.js@11816",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.1.18",
     "three": "^0.182.0",
+    "tunnel-rat": "^0.1.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
