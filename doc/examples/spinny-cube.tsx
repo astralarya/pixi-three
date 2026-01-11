@@ -6,10 +6,7 @@ import { Container, Graphics } from "pixi.js";
 import { extend, useTick } from "@pixi/react";
 
 import { PixiTexture } from "#pixi-texture";
-import {
-  usePixiTextureContext,
-  usePixiTextureEvents,
-} from "#pixi-texture-context";
+import { usePixiTextureEvents } from "#pixi-texture-context";
 
 extend({ Graphics });
 
@@ -57,7 +54,7 @@ function randomColor() {
   );
 }
 
-function SpinnyCubeTexture() {
+export function SpinnyCubeTexture() {
   const [hover1, setHover1] = useState(false);
   const [hover2, setHover2] = useState(false);
 
@@ -68,7 +65,6 @@ function SpinnyCubeTexture() {
   const star2_color1 = useRef(randomColor());
   const star2_color2 = useRef(randomColor());
 
-  const { render } = usePixiTextureContext();
   const time1 = useRef(0);
   const time2 = useRef(0);
   useTick((ticker) => {
@@ -76,7 +72,6 @@ function SpinnyCubeTexture() {
     time2.current += ticker.deltaMS * (hover2 ? 0.2 : 1);
     star1.current.rotation = ((time1.current % 4000) / 4000) * 2 * Math.PI;
     star2.current.scale = Math.sin((time2.current / 1000 / 2) * Math.PI) + 1.5;
-    render();
   });
 
   function drawStar1(graphics: Graphics) {
