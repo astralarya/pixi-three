@@ -16,10 +16,11 @@ export default defineConfig({
       },
     }),
     tailwindcss(),
-    dts({ tsconfigPath: "./tsconfig.app.json" }),
+    dts({ tsconfigPath: "./tsconfig.app.json", exclude: ["doc"] }),
   ],
   build: {
     outDir: "dist",
+    copyPublicDir: false,
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       formats: ["es"],
