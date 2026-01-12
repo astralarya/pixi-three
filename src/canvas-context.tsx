@@ -10,7 +10,6 @@ import { ThreeRoot, type ThreeRootBaseProps } from "./three-root";
 import { ThreeSceneRenderer } from "./three-scene";
 
 export interface CanvasContextProps extends ThreeRootBaseProps {
-  className?: string;
   children?: ReactNode;
 }
 
@@ -44,7 +43,7 @@ export function CanvasContext({
   const [pixiTextureTunnel] = useState(tunnel());
 
   return (
-    <div ref={eventContainer}>
+    <div ref={eventContainer} className="contents">
       <CanvasContextValue
         value={{
           tunnel: canvasViewTunnel,

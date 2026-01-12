@@ -1,53 +1,44 @@
-import { CanvasContext } from "#canvas-context.tsx";
-import { CanvasView } from "#canvas-view.tsx";
-import { ThreeScene } from "#three-scene.tsx";
+import type { PropsWithChildren } from "react";
 import { useState } from "react";
-import { SpinnyCube } from "./examples/spinny-cube";
-import { SpinnyStar } from "./examples/spinny-star";
+import { BasicScene } from "./scene/basic-scene";
+
+type Tab = "unmounted" | "basic";
 
 function App() {
-  const [toggle, setToggle] = useState(true);
+  const [tab, setTab] = useState<Tab>("basic");
+
+  const tabStyle = (t: Tab) =>
+    `cursor-pointer p-2 rounded-sm ${
+      tab === t ? "bg-amber-400" : "bg-amber-500 hover:bg-amber-400"
+    }`;
 
   return (
-    <>
+    <div className="h-screen flex flex-col">
       <div className="bg-neutral-300 p-4">
         <h1 className="text-2xl">Pixi + Three</h1>
-        <div className="mt-2 flex items-center gap-4">
+        <div className="mt-2 flex items-center gap-2">
           <button
-            className="bg-amber-500 hover:bg-amber-400 cursor-pointer p-2 rounded-sm"
-            onClick={() => setToggle((x) => !x)}
+            className={tabStyle("unmounted")}
+            onClick={() => setTab("unmounted")}
           >
-            Toggle canvas context
+            Unmount
           </button>
-          <span>
-            Canvas context is{" "}
-            <span
-              className={`${toggle ? "text-green-700" : "text-red-700"} font-bold`}
-            >
-              {toggle ? "mounted" : "unmounted"}
-            </span>
-          </span>
+          <button className={tabStyle("basic")} onClick={() => setTab("basic")}>
+            Basic
+          </button>
         </div>
       </div>
-      {toggle && (
-        <CanvasContext>
-          <CanvasView className="h-[calc(100lvh-7rem)] w-full" alpha>
-            <ThreeScene>
-              <SpinnyCube position={[-2, -2, 0]} />
-              <SpinnyCube position={[0, -2, 0]} />
-              <SpinnyCube position={[2, -2, 0]} />
-              <SpinnyCube position={[-2, 0, 0]} />
-              <SpinnyCube position={[0, 0, 0]} />
-              <SpinnyCube position={[2, 0, 0]} />
-              <SpinnyCube position={[-2, 2, 0]} />
-              <SpinnyCube position={[0, 2, 0]} />
-              <SpinnyCube position={[2, 2, 0]} />
-            </ThreeScene>
-            <SpinnyStar />
-          </CanvasView>
-        </CanvasContext>
+      {tab === "unmounted" && (
+        <CenteredContent>Canvas unmounted</CenteredContent>
       )}
-    </>
+      {tab === "basic" && <BasicScene />}
+    </div>
+  );
+}
+
+function CenteredContent({ children }: PropsWithChildren) {
+  return (
+    <div className="flex-1 flex items-center justify-center">{children}</div>
   );
 }
 
