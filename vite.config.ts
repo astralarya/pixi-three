@@ -24,17 +24,18 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
-      external: [
-        "react",
-        "react-dom",
-        "react/jsx-runtime",
-        "three",
-        "pixi.js",
-        "@pixi/react",
-        "@react-three/fiber",
-        "its-fine",
-        "tunnel-rat",
-      ],
+      external: (id) =>
+        [
+          "react",
+          "react-dom",
+          "react/jsx-runtime",
+          "three",
+          "pixi.js",
+          "@pixi/react",
+          "@react-three/fiber",
+          "its-fine",
+          "tunnel-rat",
+        ].includes(id) || id.startsWith("three/"),
     },
   },
 });
