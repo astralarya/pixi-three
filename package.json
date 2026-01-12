@@ -1,8 +1,8 @@
 {
   "name": "@astralarium/pixi-three",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
-  "description": "Brief description of what this package does",
+  "description": "Write declarative apps seamlessly blending 2d and 3d components in React",
   "license": "MIT",
   "author": "Mara Kim <mara@astralarium.net>",
   "repository": {
