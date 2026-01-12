@@ -214,7 +214,6 @@ function ThreeSceneSpriteInternal({
 
   function onTextureUpdate(texture: GPUTexture) {
     sprite.current.texture.source.resource = texture;
-    sprite.current.texture.source.update();
   }
   useImperativeHandle(spriteRef, () => sprite.current, []);
 
