@@ -15,6 +15,7 @@ export interface CanvasTreeStore {
 
 export interface CanvasTreeContextValue {
   store: CanvasTreeStore;
+  invalidate: () => void;
 }
 
 export const CanvasTreeContext = createContext<CanvasTreeContextValue | null>(
@@ -59,9 +60,7 @@ export function useCanvasTree() {
       "useCanvasTree() must be called within a <CanvasViewContent />",
     );
   }
-  const size = useSyncExternalStore(
-    context.store.subscribe,
-    context.store.getSnapshot,
-  );
-  return { size };
+  const { store, ...rest } = context;
+  const size = useSyncExternalStore(store.subscribe, store.getSnapshot);
+  return { size, ...rest };
 }

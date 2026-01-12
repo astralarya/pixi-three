@@ -143,6 +143,7 @@ function PixiTextureInternal({
 
   const containerRef = useRef<Container>(null!);
   const pixiTextureRef = useRef(new RenderTexture());
+  const frameRequested = useRef(true);
 
   const store = useCanvasTreeStore();
   useEffect(() => {
@@ -181,11 +182,19 @@ function PixiTextureInternal({
     });
   }
 
+  function invalidate() {
+    frameRequested.current = true;
+  }
+
   useEffect(render);
 
   useTick({
-    callback: render,
-    isEnabled: frameloop === "always",
+    callback: () => {
+      if (frameloop === "always" || frameRequested.current) {
+        render();
+        frameRequested.current = false;
+      }
+    },
   });
 
   const localEventBoundary = new EventBoundary();
@@ -200,14 +209,13 @@ function PixiTextureInternal({
   }
 
   return (
-    <CanvasTreeContext value={{ store }}>
+    <CanvasTreeContext value={{ store, invalidate }}>
       <PixiTextureContext
         value={{
           width,
           height,
           sceneTunnel,
           containerRef,
-          render,
           getAttachedObject,
           hitTest,
           mapUvToPoint,

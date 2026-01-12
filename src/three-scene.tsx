@@ -68,8 +68,8 @@ export interface ThreeSceneBaseProps {
   renderPriority?: number;
   /** Optional event priority, defaults to 0 */
   eventPriority?: number;
-  /** Optional frame count, defaults to Infinity. If you set it to 1, it would only render a single frame, etc */
-  frames?: number;
+  /** Optional frameloop, defaults to "always" */
+  frameloop?: "always" | "demand";
   /** Optional event compute, defaults to undefined */
   eventCompute?: ComputeFunction;
   /** Optional post processing factory, defaults to undefined */
@@ -93,7 +93,7 @@ export function ThreeScene({
   renderTargetOptions,
   renderPriority,
   eventPriority,
-  frames,
+  frameloop,
   eventCompute,
   postProcessing,
   children,
@@ -119,7 +119,7 @@ export function ThreeScene({
         renderTargetOptions={renderTargetOptions}
         renderPriority={renderPriority}
         eventPriority={eventPriority}
-        frames={frames}
+        frameloop={frameloop}
         eventCompute={eventCompute}
         postProcessing={postProcessing}
       >
@@ -174,13 +174,21 @@ function ThreeSceneSpriteInternal({
   renderTargetOptions,
   renderPriority = 0,
   eventPriority = 0,
-  frames = Infinity,
+  frameloop = "always",
   eventCompute,
   postProcessing,
   children,
 }: ThreeSceneSpriteInternalProps) {
   const { canvasRef, containerRef: canvasContainerRef } = useCanvasView();
   const [scene] = useState(new Scene());
+
+  const frameRequested = useRef(true);
+  function invalidate() {
+    frameRequested.current = true;
+  }
+  function clearFrameRequest() {
+    frameRequested.current = false;
+  }
 
   const { size } = useCanvasTree();
   const width = widthProp ?? size.width;
@@ -281,11 +289,10 @@ function ThreeSceneSpriteInternal({
 
   return (
     <>
-      <CanvasTreeContext value={{ store }}>
+      <CanvasTreeContext value={{ store, invalidate }}>
         <ThreeSceneContext value={{ containerRef, sceneTunnel }}>
           {createPortal(
             <Portal
-              frames={frames}
               renderPriority={renderPriority}
               width={width}
               height={height}
@@ -293,6 +300,9 @@ function ThreeSceneSpriteInternal({
               renderTargetOptions={renderTargetOptions}
               onTextureUpdate={onTextureUpdate}
               postProcessing={postProcessing}
+              frameloop={frameloop}
+              frameRequested={frameRequested}
+              clearFrameRequest={clearFrameRequest}
             >
               {children}
               <sceneTunnel.Out />

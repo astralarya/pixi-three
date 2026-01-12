@@ -11,6 +11,7 @@ import {
   type RefObject,
   useEffect,
   useImperativeHandle,
+  useRef,
   useState,
 } from "react";
 import {
@@ -50,8 +51,8 @@ export interface ThreeRenderTextureProps {
   renderPriority?: number;
   /** Optional event priority, defaults to 0 */
   eventPriority?: number;
-  /** Optional frame count, defaults to Infinity. If you set it to 1, it would only render a single frame, etc */
-  frames?: number;
+  /** Optional frameloop, defaults to "always" */
+  frameloop?: "always" | "demand";
   /** Optional event compute, defaults to undefined */
   compute?: ComputeFunction;
   /** Children will be rendered into a portal */
@@ -68,11 +69,19 @@ export function ThreeRenderTexture({
   options,
   renderPriority = 0,
   eventPriority = 0,
-  frames = Infinity,
+  frameloop = "always",
   compute,
   children,
 }: ThreeRenderTextureProps) {
   const [scene] = useState(new Scene());
+
+  const frameRequested = useRef(true);
+  function invalidate() {
+    frameRequested.current = true;
+  }
+  function clearFrameRequest() {
+    frameRequested.current = false;
+  }
 
   const { size } = useCanvasTree();
   const width = widthProp ?? size.width;
@@ -125,7 +134,7 @@ export function ThreeRenderTexture({
 
   return (
     <>
-      <CanvasTreeContext value={{ store }}>
+      <CanvasTreeContext value={{ store, invalidate }}>
         <ThreeSceneContext value={{ containerRef, sceneTunnel }}>
           {createPortal(
             <Portal
@@ -134,12 +143,14 @@ export function ThreeRenderTexture({
                   setTexture(renderTarget.texture);
                 }
               }}
-              frames={frames}
               renderPriority={renderPriority}
               width={width}
               height={height}
               resolution={resolution}
               renderTargetOptions={options}
+              frameloop={frameloop}
+              frameRequested={frameRequested}
+              clearFrameRequest={clearFrameRequest}
             >
               {children}
               <sceneTunnel.Out />

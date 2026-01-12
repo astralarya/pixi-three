@@ -2,6 +2,7 @@ import { type RootState, useFrame, useThree } from "@react-three/fiber";
 import {
   type ReactNode,
   type Ref,
+  type RefObject,
   useEffect,
   useEffectEvent,
   useImperativeHandle,
@@ -21,7 +22,6 @@ import { type PostProcessing, type WebGPURenderer } from "three/webgpu";
 
 export interface PortalProps {
   ref?: Ref<RenderTarget>;
-  frames: number;
   renderPriority: number;
   width: number;
   height: number;
@@ -30,11 +30,16 @@ export interface PortalProps {
   children: ReactNode;
   onTextureUpdate?: (x: GPUTexture) => unknown;
   postProcessing?: (x: RootState) => PostProcessing;
+  /** Frameloop mode: "always" renders every frame, "demand" only renders when frameRequested is true */
+  frameloop?: "always" | "demand";
+  /** Ref to check if a frame render is requested (for frameloop="demand") */
+  frameRequested?: RefObject<boolean>;
+  /** Callback to clear the frame request after rendering */
+  clearFrameRequest?: () => void;
 }
 
 export function Portal({
   ref,
-  frames,
   renderPriority,
   width,
   height,
@@ -43,6 +48,9 @@ export function Portal({
   children,
   onTextureUpdate,
   postProcessing,
+  frameloop = "always",
+  frameRequested,
+  clearFrameRequest,
 }: PortalProps) {
   const state = useThree();
   const backendData = (
@@ -94,6 +102,7 @@ export function Portal({
 
   const onResize = useEffectEvent(
     (width: number, height: number, resolution: number) => {
+      // eslint-disable-next-line react-hooks/immutability
       (camera as PerspectiveCamera).aspect = width / height;
       camera.updateProjectionMatrix();
       setSize(width, height);
@@ -105,15 +114,15 @@ export function Portal({
     onResize(width, height, resolution);
   }, [width, height, resolution]);
 
-  let count = 0;
   const postProcessor = postProcessing ? postProcessing(state) : null;
   useFrame(() => {
-    if (frames === Infinity || count < frames) {
+    if (frameloop === "always" || frameRequested?.current) {
       const gl = state.gl as unknown as WebGPURenderer;
       const oldAutoClear = gl.autoClear;
       const oldXrEnabled = gl.xr.enabled;
       const oldIsPresenting = gl.xr.isPresenting;
       const oldRenderTarget = gl.getRenderTarget();
+      // eslint-disable-next-line react-hooks/immutability
       gl.autoClear = true;
       gl.xr.enabled = false;
       gl.xr.isPresenting = false;
@@ -131,7 +140,7 @@ export function Portal({
       gl.autoClear = oldAutoClear;
       gl.xr.enabled = oldXrEnabled;
       gl.xr.isPresenting = oldIsPresenting;
-      count++;
+      clearFrameRequest?.();
     }
   }, renderPriority);
   return <>{children}</>;

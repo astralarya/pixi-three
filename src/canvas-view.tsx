@@ -138,6 +138,8 @@ function CanvasViewContent({
 
   const [isVisible, setIsVisible] = useState(true);
 
+  const frameRequested = useRef(true);
+
   const store = useCanvasTreeStore();
   const { subscribe, updateSnapshot, notifySubscribers } = store;
 
@@ -221,18 +223,18 @@ function CanvasViewContent({
     });
   }
 
-  // HOPE useEffectEvent
-  // const renderEffect = useEffectEvent(render);
-  // useEffect(() => {
-  //   if (app.isInitialised) {
-  //     renderEffect();
-  //   }
-  // }, [app.isInitialised]);
-  // END HOPE
+  function invalidate() {
+    frameRequested.current = true;
+  }
 
   useTick({
-    callback: render,
-    isEnabled: frameloop === "always" && isVisible,
+    callback: () => {
+      if (frameloop === "always" || frameRequested.current) {
+        render();
+        frameRequested.current = false;
+      }
+    },
+    isEnabled: isVisible,
   });
 
   return (
@@ -242,7 +244,7 @@ function CanvasViewContent({
         containerRef,
       }}
     >
-      <CanvasTreeContext value={{ store }}>
+      <CanvasTreeContext value={{ store, invalidate }}>
         <pixiContainer
           ref={(ref) => {
             if (!ref) {

@@ -13,7 +13,6 @@ export interface PixiTextureContextValue {
   height: number;
   sceneTunnel: ReturnType<typeof tunnel>;
   containerRef: RefObject<Container>;
-  render: () => unknown;
   getAttachedObject: () => Object3D | undefined;
   hitTest: (x: number, y: number) => Container;
   mapUvToPoint: (point: Point, uv: Vector2) => void;
