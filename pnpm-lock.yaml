@@ -7,13 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      its-fine:
-        specifier: ^2.0.0
-        version: 2.0.0(@types/react@19.2.8)(react@19.2.3)
-      tunnel-rat:
-        specifier: ^0.1.2
-        version: 0.1.2(@types/react@19.2.8)(react@19.2.3)
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.1
@@ -57,6 +50,9 @@ importers:
       globals:
         specifier: ^16.5.0
         version: 16.5.0
+      its-fine:
+        specifier: ^2.0.0
+        version: 2.0.0(@types/react@19.2.8)(react@19.2.3)
       pixi.js:
         specifier: https://pkg.pr.new/pixijs/pixijs/pixi.js@11816
         version: https://pkg.pr.new/pixijs/pixijs/pixi.js@11816
@@ -72,6 +68,9 @@ importers:
       three:
         specifier: ^0.182.0
         version: 0.182.0
+      tunnel-rat:
+        specifier: ^0.1.2
+        version: 0.1.2(@types/react@19.2.8)(react@19.2.3)
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
