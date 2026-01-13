@@ -36,11 +36,18 @@ declare module "@react-three/fiber" {
  */
 export interface ThreeRootBaseProps {
   eventSource?: RefObject<HTMLElement | null>;
-  /** WebGPURenderer parameters */
+  /**
+   * {@link https://threejs.org/docs/#api/en/renderers/webgpu/WebGPURenderer | WebGPURenderer} parameters
+   */
   threeRendererParameters?: Partial<WebGPURendererParameters>;
-  /** Callback after the canvas has rendered (but not yet committed) */
+  /**
+   * Callback after the {@link https://r3f.docs.pmnd.rs/api/canvas | canvas} has rendered (but not yet committed)
+   */
   onCreated?: (state: RootState) => void;
-  /** Response for pointer clicks that have missed any target */
+  /**
+   * Handler for pointer clicks that have missed any target
+   * @see {@link https://r3f.docs.pmnd.rs/api/events | React Three Fiber Events}
+   */
   onPointerMissed?: (event: MouseEvent) => void;
 }
 

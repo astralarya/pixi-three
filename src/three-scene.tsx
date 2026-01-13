@@ -76,7 +76,9 @@ export interface ThreeSceneBaseProps {
   height?: number;
   /** Optional resolution of the texture, defaults to canvas parent resolution */
   resolution?: number;
-  /** Optional RenderTarget options */
+  /**
+   * Optional {@link https://threejs.org/docs/#WebGLRenderTarget | RenderTarget} options
+   */
   renderTargetOptions?: RenderTargetOptions;
   /** Optional render priority, defaults to 0 */
   renderPriority?: number;
@@ -84,9 +86,13 @@ export interface ThreeSceneBaseProps {
   eventPriority?: number;
   /** Optional frameloop, defaults to "always" */
   frameloop?: "always" | "demand";
-  /** Optional event compute, defaults to undefined */
+  /**
+   * Optional event compute for {@link https://r3f.docs.pmnd.rs/api/events | React Three Fiber Events}, defaults to undefined
+   */
   eventCompute?: ComputeFunction;
-  /** Optional post processing factory, defaults to undefined */
+  /**
+   * Optional {@link https://github.com/mrdoob/three.js/blob/dev/examples/jsm/tsl/display/PostProcessing.js | PostProcessing} factory, defaults to undefined
+   */
   postProcessing?: (x: RootState) => PostProcessing;
   /** Optional FPS limit */
   fpsLimit?: number;
@@ -95,9 +101,11 @@ export interface ThreeSceneBaseProps {
 }
 
 /**
- * A Pixi Sprite that contains React Three Fiber children.
+ * A {@link https://pixijs.download/release/docs/scene.Sprite.html | Pixi Sprite} that contains
+ * {@link https://r3f.docs.pmnd.rs/getting-started/introduction | React Three Fiber} children.
  *
- * Renders Three.js 3D content as a Pixi.js sprite.
+ * Renders {@link https://threejs.org/docs/#Scene | Three.js} 3D content as a
+ * {@link https://react.pixijs.io/components/sprite | Pixi.js sprite}.
  * It must be inside a {@link CanvasView} component.
  *
  * @category component

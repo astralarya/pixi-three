@@ -36,11 +36,17 @@ import { useRenderSchedule } from "./use-render-schedule";
  * @expand
  */
 export interface ThreeRenderTextureProps {
-  /** Render Texture Ref */
+  /**
+   * Render {@link https://threejs.org/docs/#Texture | Texture} Ref
+   */
   ref?: Ref<Texture>;
-  /** R3F attach RenderTarget Texture */
+  /**
+   * RenderTarget Texture {@link https://r3f.docs.pmnd.rs/api/objects#attach | React Three Fiber attach}
+   */
   attach?: AttachType;
-  /** Optional Object3D for event computation, defaults to fiber parent if any */
+  /**
+   * Optional {@link https://threejs.org/docs/#Object3D | Object3D} for event computation, defaults to fiber parent if any
+   */
   objectRef?: RefObject<Object3D>;
   /** Optional width of the texture, defaults to canvas parent bounds */
   width?: number;
@@ -48,7 +54,9 @@ export interface ThreeRenderTextureProps {
   height?: number;
   /** Optional resolution of the texture, defaults to canvas parent resolution */
   resolution?: number;
-  /** Optional RenderTarget options */
+  /**
+   * Optional {@link https://threejs.org/docs/#RenderTarget | RenderTarget} options
+   */
   options?: RenderTargetOptions;
   /** Optional render priority, defaults to 0 */
   renderPriority?: number;
@@ -56,7 +64,9 @@ export interface ThreeRenderTextureProps {
   eventPriority?: number;
   /** Optional frameloop, defaults to "always" */
   frameloop?: "always" | "demand";
-  /** Optional event compute, defaults to undefined */
+  /**
+   * Optional event compute for {@link https://r3f.docs.pmnd.rs/api/events | React Three Fiber events}, defaults to undefined
+   */
   compute?: ComputeFunction;
   /** Optional FPS limit */
   fpsLimit?: number;
@@ -65,9 +75,9 @@ export interface ThreeRenderTextureProps {
 }
 
 /**
- * A Three RenderTarget Texture that contains React Three Fiber children.
+ * A {@link https://threejs.org/docs/#RenderTarget | Three.js RenderTarget}
+ * containing {@link https://r3f.docs.pmnd.rs | React Three Fiber} children.
  *
- * Renders Three.js 3D content into a Three.js RenderTarget texture.
  * It must be inside a {@link ThreeScene} component.
  *
  * @category component

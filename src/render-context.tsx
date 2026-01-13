@@ -22,9 +22,11 @@ export interface RenderContextProps extends ThreeRootBaseProps {
 
 /**
  * Context manager for all canvas views, which share GPU resources.
+ * Wraps all {@link CanvasView} components and contains DOM children.
  *
- * This is the top-level component that manages shared GPU resources for all canvas views in your application.
- * It wraps all {@link CanvasView} components and contains DOM children.
+ * Top-level component that initializes the {@link https://react.pixijs.io/components/application | React Pixi Application}
+ * and {@link https://r3f.docs.pmnd.rs | React Three Fiber root}.
+ * Manages shared GPU resources for all canvas views in your application.
  *
  * @category component
  * @param props - Component props

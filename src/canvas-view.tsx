@@ -44,7 +44,10 @@ export interface CanvasViewProps extends PropsWithChildren {
   antialias?: boolean;
   /** Canvas resolution. Defaults to window.devicePixelRatio */
   resolution?: number;
-  /** Pixi view transform. Defaults to identity matrix */
+  /**
+   * Pixi view transform {@link https://pixijs.download/release/docs/maths.Matrix.html | Matrix}.
+   * Defaults to identity matrix
+   */
   transform?: Matrix;
   /** Optional FPS limit */
   fpsLimit?: number;

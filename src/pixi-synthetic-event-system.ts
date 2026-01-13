@@ -47,6 +47,12 @@ interface PixiRootEvents {
   wheelEvent: FederatedWheelEvent;
 }
 
+/**
+ * Options for binding events to Pixi.js containers.
+ *
+ * @see {@link https://pixijs.download/release/docs/scene.Container.html | Pixi Container}
+ * @see {@link https://pixijs.download/release/docs/events.EventBoundary.html | Pixi EventBoundary}
+ */
 export interface BindEventOptions<
   TEvent,
   TEventHandlers = Record<string, (event: TEvent) => void>,
@@ -71,7 +77,11 @@ export type EventGuard<
 
 /**
  * A synthetic event system that serves as a base class
- * for custom event systems
+ * for custom event systems.
+ *
+ * @see {@link https://pixijs.download/release/docs/events.EventSystem.html | Pixi EventSystem}
+ * @see {@link https://pixijs.download/release/docs/events.EventBoundary.html | Pixi EventBoundary}
+ * @see {@link https://pixijs.download/release/docs/events.FederatedPointerEvent.html | Pixi FederatedPointerEvent}
  */
 export class PixiSyntheticEventSystem<
   TEvent,

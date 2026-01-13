@@ -20,6 +20,13 @@ import {
   PixiSyntheticEventSystem,
 } from "./pixi-synthetic-event-system";
 
+/**
+ * Options for binding Three.js events to Pixi.js containers.
+ *
+ * @see {@link https://pixijs.download/release/docs/scene.Container.html | Pixi Container}
+ * @see {@link https://pixijs.download/release/docs/events.EventBoundary.html | Pixi EventBoundary}
+ * @see {@link https://r3f.docs.pmnd.rs/api/events | React Three Fiber Events}
+ */
 export interface PixiThreeEventBindOptions {
   container: RefObject<Container>;
   eventBoundary?: string | EventBoundary;
@@ -30,6 +37,8 @@ export interface PixiThreeEventBindOptions {
  * Event system for Three.js integration with Pixi.js.
  * Extends PixiSyntheticEventSystem to provide UV-based coordinate mapping
  * from Three.js raycasting intersections.
+ *
+ * @see {@link https://r3f.docs.pmnd.rs/api/events | React Three Fiber Events}
  */
 export class PixiThreeEventSystem extends PixiSyntheticEventSystem<
   ThreeEvent<DomEvent>,
@@ -42,7 +51,8 @@ export class PixiThreeEventSystem extends PixiSyntheticEventSystem<
   /**
    * Override mapEventToPoint to use Three.js-specific UV mapping.
    * Maps a Three.js event (with intersection data) to a point in Pixi space.
-   * @param point - The point to write the result to
+   *
+   * @param point - The {@link https://pixijs.download/release/docs/maths.Point.html | Point} to write the result
    * @param event - The source event (ThreeEvent with intersection data)
    * @param eventBoundary - The event boundary context
    */
@@ -73,9 +83,10 @@ export class PixiThreeEventSystem extends PixiSyntheticEventSystem<
 
   /**
    * Maps UV coordinates to Pixi pixel coordinates.
-   * @param point - The point to write the result to
-   * @param uv - UV coordinates (0-1 range)
-   * @param bounds - The bounds to map within
+   *
+   * @param point - The {@link https://pixijs.download/release/docs/maths.Point.html | Point} to write the result
+   * @param uv - {@link https://threejs.org/docs/#Vector2 | Vector2} of UV coordinates (0-1 range)
+   * @param bounds - The {@link https://pixijs.download/release/docs/maths.Bounds.html | Bounds} to map within
    */
   public mapUvToPoint(point: Point, uv: Vector2, bounds: Rectangle | Bounds) {
     point.x = uv.x * bounds.width + bounds.x;
@@ -84,9 +95,12 @@ export class PixiThreeEventSystem extends PixiSyntheticEventSystem<
 
   /**
    * Binds Three.js event handlers to Pixi containers.
-   * @param container - Container(s) or bind options
+   *
+   * @param domElement - HTML element to attach event handlers
+   * @param container - {@link https://pixijs.download/release/docs/scene.Container.html | Container}(s) or bind options
    * @param handlers - Optional event handlers to chain
    * @returns EventHandlers object for use with react-three-fiber
+   * @see {@link https://r3f.docs.pmnd.rs/api/events | React Three Fiber Events}
    */
   public bind(
     domElement: RefObject<HTMLElement>,

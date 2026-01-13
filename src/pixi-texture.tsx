@@ -54,13 +54,21 @@ export function PixiTextureRenderer() {
  * @expand
  */
 export interface PixiTextureProps extends PropsWithChildren {
-  /** TextureNode Ref */
+  /**
+   * {@link https://threejs.org/docs/#TextureNode | TextureNode} Ref
+   */
   ref?: Ref<TextureNode>;
-  /** Pixi Container Ref */
+  /**
+   * Pixi {@link https://pixijs.download/release/docs/scene.Container.html | Container} Ref
+   */
   containerRef?: Ref<Container>;
-  /** Optional Object3D for event computation, defaults to fiber parent if any */
+  /**
+   * Optional {@link https://threejs.org/docs/#Object3D | Object3D} for event computation, defaults to fiber parent if any
+   */
   objectRef?: RefObject<Object3D>;
-  /** R3F attach TextureNode */
+  /**
+   * TextureNode {@link https://r3f.docs.pmnd.rs/api/objects#attach | React Three Fiber attach}
+   */
   attach?: AttachType;
   /** Texture width */
   width: number;
@@ -68,16 +76,18 @@ export interface PixiTextureProps extends PropsWithChildren {
   height: number;
   /** Optional frameloop, defaults to "demand" */
   frameloop?: "always" | "demand";
-  /** Pixi view transform. Defaults to identity matrix */
+  /**
+   * Pixi view transform {@link https://pixijs.download/release/docs/maths.Matrix.html | Matrix}. Defaults to identity matrix
+   */
   transform?: Matrix;
   /** Optional FPS limit */
   fpsLimit?: number;
 }
 
 /**
- * A Three TextureNode that contains React Pixi children.
+ * A {@link https://threejs.org/docs/#TextureNode | Three TextureNode}
+ * that that renders {@link https://react.pixijs.io/components/pixi-components | React Pixi} children.
  *
- * Renders Pixi.js 2D content into a Three.js texture.
  * It must be inside a {@link ThreeScene} component.
  *
  * @category component
