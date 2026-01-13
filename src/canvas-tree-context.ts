@@ -29,8 +29,8 @@ export const CanvasTreeContext = createContext<CanvasTreeContextValue | null>(
 export function useCanvasTreeStore(): CanvasTreeStore {
   const subscribers = useRef(new Set<(size: CanvasViewSize) => void>());
   const sizeSnapshot = useRef<CanvasViewSize>({
-    width: 0,
-    height: 0,
+    width: 1,
+    height: 1,
     resolution: window.devicePixelRatio,
   });
 

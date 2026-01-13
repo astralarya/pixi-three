@@ -62,8 +62,8 @@ export function RenderContext({
       >
         <Application
           className="hidden"
-          width={0}
-          height={0}
+          width={1}
+          height={1}
           preference="webgpu"
           resolution={2}
         >
