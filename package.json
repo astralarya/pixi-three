@@ -7,7 +7,7 @@
   "author": "Mara Kim <mara@astralarium.net>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/astralarya/pixi-three"
+    "url": "https://github.com/astralarium/pixi-three"
   },
   "keywords": [
     "pixi",
@@ -16,9 +16,9 @@
     "webgpu"
   ],
   "bugs": {
-    "url": "https://github.com/astralarya/pixi-three/issues"
+    "url": "https://github.com/astralarium/pixi-three/issues"
   },
-  "homepage": "https://github.com/astralarya/pixi-three#readme",
+  "homepage": "https://astralarium.github.io/pixi-three",
   "files": [
     "dist"
   ],
