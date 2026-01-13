@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-import { useCanvasTreeOptional } from "./canvas-tree-context";
+import { useInvalidate } from "./canvas-tree-context";
 
 export interface UseRenderScheduleProps {
   fpsLimit?: number;
@@ -11,7 +11,7 @@ export interface UseRenderScheduleProps {
  */
 export function useRenderSchedule({ fpsLimit }: UseRenderScheduleProps = {}) {
   const minFrameTime = fpsLimit ? 1000 / fpsLimit : 0;
-  const parentContext = useCanvasTreeOptional();
+  const parentInvalidate = useInvalidate();
   const frameRequested = useRef(true);
   const lastFrameTime = useRef<number | undefined>(undefined);
 
@@ -37,7 +37,7 @@ export function useRenderSchedule({ fpsLimit }: UseRenderScheduleProps = {}) {
     if (fpsLimit !== undefined) {
       lastFrameTime.current = performance.now();
     }
-    parentContext?.invalidate();
+    parentInvalidate();
   }
 
   return {

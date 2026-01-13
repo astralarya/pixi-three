@@ -78,7 +78,7 @@ export function ThreeRenderTexture({
   fpsLimit,
   children,
 }: ThreeRenderTextureProps) {
-  const { size } = useCanvasTree();
+  const size = useCanvasTree();
   const [scene] = useState(new Scene());
 
   const width = widthProp ?? size.width;

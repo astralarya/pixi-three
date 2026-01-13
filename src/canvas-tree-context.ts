@@ -23,23 +23,6 @@ export const CanvasTreeContext = createContext<CanvasTreeContextValue | null>(
 );
 
 /**
- * Return value of {@link useCanvasTree} and {@link useCanvasTreeOptional}.
- */
-export interface UseCanvasTreeValue {
-  /** The current canvas size and resolution. */
-  size: CanvasViewSize;
-  /** Triggers a re-render of the canvas. */
-  invalidate: () => void;
-}
-
-const noopStore: CanvasTreeStore = {
-  subscribe: () => () => {},
-  getSnapshot: () => ({ width: 0, height: 0, resolution: 1 }),
-  updateSnapshot: () => {},
-  notifySubscribers: () => {},
-};
-
-/**
  * Canvas Tree store
  * @internal
  */
@@ -76,29 +59,34 @@ export function useCanvasTreeStore(): CanvasTreeStore {
 
 /**
  * @category hook
- * @returns The canvas tree context if available, or `null` if not within a `<CanvasViewContent />`.
- */
-export function useCanvasTreeOptional(): UseCanvasTreeValue | null {
-  const context = useContext(CanvasTreeContext);
-  const store = context?.store ?? noopStore;
-  const size = useSyncExternalStore(store.subscribe, store.getSnapshot);
-  if (context === null) {
-    return null;
-  }
-  return { size, invalidate: context.invalidate };
-}
-
-/**
- * @category hook
- * @returns The canvas tree context.
+ * @returns The current canvas size.
  * @throws If called outside of a `<CanvasViewContent />`.
  */
-export function useCanvasTree(): UseCanvasTreeValue {
-  const context = useCanvasTreeOptional();
+export function useCanvasTree(): CanvasViewSize {
+  const context = useContext(CanvasTreeContext);
   if (context === null) {
     throw Error(
       "useCanvasTree() must be called within a <CanvasViewContent />",
     );
   }
-  return context;
+  const size = useSyncExternalStore(
+    context.store.subscribe,
+    context.store.getSnapshot,
+  );
+  return size;
+}
+
+/**
+ * Hook that returns the invalidate function from the canvas tree context.
+ * This triggers a re-render of the canvas when called.
+ *
+ * Unlike {@link useCanvasTree}, this hook does not subscribe to canvas
+ * size changes, preventing unnecessary re-renders.
+ *
+ * @category hook
+ * @returns The invalidate function, or a no-op if not within a canvas tree context
+ */
+export function useInvalidate(): () => void {
+  const context = useContext(CanvasTreeContext);
+  return context?.invalidate ?? (() => {});
 }

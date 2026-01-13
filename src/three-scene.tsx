@@ -193,7 +193,7 @@ function ThreeSceneSpriteInternal({
   children,
 }: ThreeSceneSpriteInternalProps) {
   const { canvasRef, containerRef: canvasContainerRef } = useCanvasView();
-  const { size } = useCanvasTree();
+  const size = useCanvasTree();
   const [scene] = useState(new Scene());
 
   const width = widthProp ?? size.width;
