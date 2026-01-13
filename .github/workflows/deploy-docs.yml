@@ -33,6 +33,13 @@ jobs:
           node-version: "20"
           cache: "pnpm"
 
+      # HOPE merge https://github.com/pixijs/pixijs/pull/11816
+      # stop using https://pkg.pr.new/pixijs/pixijs/pixi.js@11816
+      # delete this
+      - name: Configure pnpm
+        run: pnpm config set strict-store-pkg-content-check false
+      # END HOPE
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
