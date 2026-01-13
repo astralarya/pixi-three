@@ -58,6 +58,7 @@ export function ThreeSceneRenderer() {
 /** @expand */
 export type ThreeSceneProps = PixiReactElementProps & ThreeSceneBaseProps;
 
+/** @expand */
 export interface ThreeSceneBaseProps {
   /** Optional width of the texture, defaults to canvas parent bounds */
   width?: number;
