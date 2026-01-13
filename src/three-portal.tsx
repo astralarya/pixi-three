@@ -37,6 +37,9 @@ export interface PortalProps {
   signalFrame?: () => void;
 }
 
+/**
+ * @internal
+ */
 export function Portal({
   ref,
   renderPriority,

@@ -58,6 +58,9 @@ export interface ThreeRenderTextureProps {
   children: ReactNode;
 }
 
+/**
+ * @category component
+ */
 export function ThreeRenderTexture({
   ref,
   attach,

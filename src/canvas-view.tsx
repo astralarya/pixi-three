@@ -44,6 +44,9 @@ export interface CanvasViewProps extends PropsWithChildren {
   fpsLimit?: number;
 }
 
+/**
+ * @category component
+ */
 export function CanvasView({
   className,
   fallback,

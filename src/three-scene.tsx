@@ -47,6 +47,9 @@ import { useRenderSchedule } from "./use-render-schedule";
 
 extend({ Container, Sprite });
 
+/**
+ * @internal
+ */
 export function ThreeSceneRenderer() {
   const { threeSceneTunnel } = useRenderContext();
   return <threeSceneTunnel.Out />;
@@ -85,6 +88,9 @@ export interface ThreeSceneSpriteProps extends ThreeSceneBaseProps {
   containerRef: RefObject<Container>;
 }
 
+/**
+ * @category component
+ */
 export function ThreeScene({
   ref,
   width,
@@ -131,7 +137,7 @@ export function ThreeScene({
   );
 }
 
-export function ThreeSceneSprite(props: ThreeSceneSpriteProps) {
+function ThreeSceneSprite(props: ThreeSceneSpriteProps) {
   const Bridge = useBridge();
   const { app } = useApplication();
   const { threeSceneTunnel } = useRenderContext();

@@ -75,6 +75,7 @@ export function useCanvasTreeStore(): CanvasTreeStore {
 }
 
 /**
+ * @category hook
  * @returns The canvas tree context if available, or `null` if not within a `<CanvasViewContent />`.
  */
 export function useCanvasTreeOptional(): UseCanvasTreeValue | null {
@@ -88,6 +89,7 @@ export function useCanvasTreeOptional(): UseCanvasTreeValue | null {
 }
 
 /**
+ * @category hook
  * @returns The canvas tree context.
  * @throws If called outside of a `<CanvasViewContent />`.
  */

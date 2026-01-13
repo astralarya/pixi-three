@@ -35,6 +35,9 @@ import { useRenderSchedule } from "./use-render-schedule";
 
 extend({ Container });
 
+/**
+ * @internal
+ */
 export function PixiTextureRenderer() {
   const { pixiTextureTunnel } = useRenderContext();
   return (
@@ -65,6 +68,9 @@ export interface PixiTextureProps extends PropsWithChildren {
   fpsLimit?: number;
 }
 
+/**
+ * @category component
+ */
 export function PixiTexture({
   ref,
   containerRef,

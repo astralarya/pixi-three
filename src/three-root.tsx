@@ -42,6 +42,9 @@ export interface ThreeRootBaseProps {
 
 export type ThreeRootProps = ThreeRootBaseProps & PropsWithChildren;
 
+/**
+ * @internal
+ */
 export function ThreeRoot({
   children,
   eventSource,

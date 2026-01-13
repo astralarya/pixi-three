@@ -6,6 +6,9 @@ interface DomOverlayProps {
   overlay?: ReactNode;
 }
 
+/**
+ * @category component
+ */
 export function DomOverlay({ className, children, overlay }: DomOverlayProps) {
   return (
     <div className={`${className} relative touch-none overflow-clip`}>

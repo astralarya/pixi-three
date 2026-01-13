@@ -7,6 +7,9 @@ import {
   type RenderTargetOptions,
 } from "three";
 
+/**
+ * @category hook
+ */
 export function useRenderTarget(
   width?: number,
   height?: number,

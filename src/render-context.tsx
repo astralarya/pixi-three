@@ -13,6 +13,9 @@ export interface RenderContextProps extends ThreeRootBaseProps {
   children?: ReactNode;
 }
 
+/**
+ * @category component
+ */
 export function RenderContext({
   children,
   eventSource,

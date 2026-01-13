@@ -3,6 +3,7 @@ import { Fragment, type PropsWithChildren, StrictMode } from "react";
 
 /**
  * Bridges renderer Context and StrictMode from a primary renderer.
+ * @internal
  */
 export function useBridge() {
   const fiber = useFiber();

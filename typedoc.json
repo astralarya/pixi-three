@@ -10,6 +10,10 @@
   "excludeProtected": false,
   "excludeInternal": true,
   "excludeExternals": true,
+  "categoryOrder": ["component", "hook", "*"],
+  "navigation": {
+    "includeCategories": true
+  },
   "navigationLinks": {
     "GitHub": "https://github.com/astralarium/pixi-three"
   },
