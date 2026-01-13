@@ -6,7 +6,7 @@ import { SpinnyStar } from "../components/spinny-star";
 export function BasicScene() {
   return (
     <RenderContext>
-      <CanvasView className="h-full w-full" alpha>
+      <CanvasView alpha>
         <ThreeScene>
           <SpinnyCube position={[-2, -2, 0]} />
           <SpinnyCube position={[0, -2, 0]} />
