@@ -29,7 +29,6 @@ import { Portal } from "./three-portal";
 import { ThreeSceneContext, useThreeSceneContext } from "./three-scene-context";
 import { useRenderSchedule } from "./use-render-schedule";
 
-/** @inline */
 export interface ThreeRenderTextureProps {
   /** Render Texture Ref */
   ref?: Ref<Texture>;
@@ -62,6 +61,7 @@ export interface ThreeRenderTextureProps {
 /**
  * @category component
  * @param props - Component props
+ * @expandType ThreeRenderTextureProps
  */
 export function ThreeRenderTexture({
   ref,

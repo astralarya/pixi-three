@@ -9,7 +9,6 @@ import { RenderContextValue, useRenderContext } from "./render-context-hooks";
 import { ThreeRoot, type ThreeRootBaseProps } from "./three-root";
 import { ThreeSceneRenderer } from "./three-scene";
 
-/** @inline */
 export interface RenderContextProps extends ThreeRootBaseProps {
   children?: ReactNode;
 }
@@ -17,6 +16,7 @@ export interface RenderContextProps extends ThreeRootBaseProps {
 /**
  * @category component
  * @param props - Component props
+ * @expandType RenderContextProps
  */
 export function RenderContext({
   children,

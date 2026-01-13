@@ -25,7 +25,6 @@ import { useRenderSchedule } from "./use-render-schedule";
 
 extend({ Container });
 
-/** @inline */
 export interface CanvasViewProps extends PropsWithChildren {
   /** Class name for the canvas element */
   className?: string;
@@ -48,6 +47,7 @@ export interface CanvasViewProps extends PropsWithChildren {
 /**
  * @category component
  * @param props - Component props
+ * @expandType CanvasViewProps
  */
 export function CanvasView({
   className,
