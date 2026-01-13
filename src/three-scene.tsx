@@ -180,6 +180,7 @@ function ThreeSceneSpriteInternal({
   children,
 }: ThreeSceneSpriteInternalProps) {
   const { canvasRef, containerRef: canvasContainerRef } = useCanvasView();
+  const parentContext = useCanvasTree();
   const [scene] = useState(new Scene());
 
   const frameRequested = useRef(true);
@@ -188,9 +189,10 @@ function ThreeSceneSpriteInternal({
   }
   function clearFrameRequest() {
     frameRequested.current = false;
+    parentContext.invalidate();
   }
 
-  const { size } = useCanvasTree();
+  const { size } = parentContext;
   const width = widthProp ?? size.width;
   const height = heightProp ?? size.height;
   const resolution = resolutionProp ?? size.resolution;

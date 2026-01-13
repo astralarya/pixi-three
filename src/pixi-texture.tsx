@@ -26,7 +26,11 @@ import { type Object3D, type TextureNode, type Vector2 } from "three/webgpu";
 import type tunnel from "tunnel-rat";
 
 import { useCanvasContext } from "./canvas-context-hooks";
-import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
+import {
+  CanvasTreeContext,
+  useCanvasTree,
+  useCanvasTreeStore,
+} from "./canvas-tree-context";
 import { PixiTextureContext } from "./pixi-texture-context";
 import { useAttachedObject } from "./three-fiber";
 import { useThreeSceneContext } from "./three-scene-context";
@@ -140,10 +144,37 @@ function PixiTextureInternal({
   transform,
 }: PixiTextureInternalProps) {
   const app = useApplication();
+  const parentContext = useCanvasTree();
 
   const containerRef = useRef<Container>(null!);
   const pixiTextureRef = useRef(new RenderTexture());
+
   const frameRequested = useRef(true);
+  function invalidate() {
+    frameRequested.current = true;
+  }
+  function clearFrameRequest() {
+    frameRequested.current = false;
+    parentContext.invalidate();
+  }
+
+  function render() {
+    app.app.renderer.render({
+      container: containerRef.current,
+      target: pixiTextureRef.current,
+      transform,
+      label: "pixi-texture",
+    });
+  }
+
+  useTick({
+    callback: () => {
+      if (frameloop === "always" || frameRequested.current) {
+        render();
+        clearFrameRequest();
+      }
+    },
+  });
 
   const store = useCanvasTreeStore();
   useEffect(() => {
@@ -172,30 +203,6 @@ function PixiTextureInternal({
     textureRef.current.value.dispose();
     textureRef.current.value = new ExternalTexture(gpuTexture);
   }, [app.app.renderer.texture, height, textureRef, width]);
-
-  function render() {
-    app.app.renderer.render({
-      container: containerRef.current,
-      target: pixiTextureRef.current,
-      transform,
-      label: "pixi-texture",
-    });
-  }
-
-  function invalidate() {
-    frameRequested.current = true;
-  }
-
-  useEffect(render);
-
-  useTick({
-    callback: () => {
-      if (frameloop === "always" || frameRequested.current) {
-        render();
-        frameRequested.current = false;
-      }
-    },
-  });
 
   const localEventBoundary = new EventBoundary();
   function hitTest(x: number, y: number) {

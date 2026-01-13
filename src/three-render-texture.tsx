@@ -73,6 +73,7 @@ export function ThreeRenderTexture({
   compute,
   children,
 }: ThreeRenderTextureProps) {
+  const parentContext = useCanvasTree();
   const [scene] = useState(new Scene());
 
   const frameRequested = useRef(true);
@@ -81,9 +82,10 @@ export function ThreeRenderTexture({
   }
   function clearFrameRequest() {
     frameRequested.current = false;
+    parentContext.invalidate();
   }
 
-  const { size } = useCanvasTree();
+  const { size } = parentContext;
   const width = widthProp ?? size.width;
   const height = heightProp ?? size.height;
   const resolution = resolutionProp ?? size.resolution;
