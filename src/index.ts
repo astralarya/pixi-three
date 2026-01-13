@@ -1,7 +1,6 @@
 export * from "./canvas-tree-context";
 export * from "./canvas-view";
 export * from "./canvas-view-context";
-export * from "./dom-overlay";
 export * from "./pixi-dom-event-system";
 export * from "./pixi-synthetic-event-system";
 export * from "./pixi-texture";
