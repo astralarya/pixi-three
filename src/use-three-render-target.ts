@@ -7,7 +7,17 @@ import {
   type RenderTargetOptions,
 } from "three";
 
-/** @internal */
+/**
+ * @internal
+ *
+ * Hook for creating and managing a {@link https://threejs.org/docs/#RenderTarget | Three.js RenderTarget}.
+ *
+ * @param width - Optional target width, defaults to canvas size
+ * @param height - Optional target height, defaults to canvas size
+ * @param options - Optional {@link https://threejs.org/docs/#RenderTarget | RenderTarget} options
+ * @returns Ref to the RenderTarget
+ * @category hook
+ */
 export function useRenderTarget(
   width?: number,
   height?: number,

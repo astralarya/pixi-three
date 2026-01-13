@@ -61,9 +61,12 @@ export function useCanvasTreeStore(): CanvasTreeStore {
 }
 
 /**
+ * Hook for accessing the current viewport size from the nearest
+ * {@link CanvasView}, {@link ThreeScene}, {@link ThreeRenderTexture}, {@link PixiTexture}.
+ *
  * @category hook
- * @returns The current viewport size.
- * @throws If called outside of a `<CanvasViewContent />`.
+ * @returns The current viewport size
+ * @throws If called outside of a {@link CanvasView}
  */
 export function useViewport(): CanvasViewSize {
   const context = useContext(CanvasTreeContext);

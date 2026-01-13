@@ -35,6 +35,7 @@ declare module "@react-three/fiber" {
  * @expand
  */
 export interface ThreeRootBaseProps {
+  /** Optional HTML element to use as {@link https://r3f.docs.pmnd.rs/api/events | event source} */
   eventSource?: RefObject<HTMLElement | null>;
   /**
    * {@link https://threejs.org/docs/#api/en/renderers/webgpu/WebGPURenderer | WebGPURenderer} parameters
@@ -45,8 +46,7 @@ export interface ThreeRootBaseProps {
    */
   onCreated?: (state: RootState) => void;
   /**
-   * Handler for pointer clicks that have missed any target
-   * @see {@link https://r3f.docs.pmnd.rs/api/events | React Three Fiber Events}
+   * {@link https://r3f.docs.pmnd.rs/api/events | React Three Fiber} handler for pointer clicks that have missed any target
    */
   onPointerMissed?: (event: MouseEvent) => void;
 }
