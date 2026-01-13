@@ -145,7 +145,8 @@ function PixiTextureInternal({
   const containerRef = useRef<Container>(null!);
   const pixiTextureRef = useRef(new RenderTexture());
 
-  const { frameRequested, invalidate, clearFrameRequest } = useRenderSchedule();
+  const { isFrameRequested, invalidate, clearFrameRequest } =
+    useRenderSchedule();
 
   function render() {
     app.app.renderer.render({
@@ -158,7 +159,7 @@ function PixiTextureInternal({
 
   useTick({
     callback: () => {
-      if (frameloop === "always" || frameRequested.current) {
+      if (frameloop === "always" || isFrameRequested()) {
         render();
         clearFrameRequest();
       }

@@ -277,7 +277,8 @@ function ThreeSceneSpriteInternal({
 
   const sceneTunnel = tunnel();
 
-  const { frameRequested, invalidate, clearFrameRequest } = useRenderSchedule();
+  const { isFrameRequested, invalidate, clearFrameRequest } =
+    useRenderSchedule();
 
   return (
     <>
@@ -293,7 +294,7 @@ function ThreeSceneSpriteInternal({
               onTextureUpdate={onTextureUpdate}
               postProcessing={postProcessing}
               frameloop={frameloop}
-              frameRequested={frameRequested}
+              isFrameRequested={isFrameRequested}
               clearFrameRequest={clearFrameRequest}
             >
               {children}

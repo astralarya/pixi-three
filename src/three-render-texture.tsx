@@ -121,7 +121,8 @@ export function ThreeRenderTexture({
 
   const sceneTunnel = tunnel();
 
-  const { frameRequested, invalidate, clearFrameRequest } = useRenderSchedule();
+  const { isFrameRequested, invalidate, clearFrameRequest } =
+    useRenderSchedule();
 
   return (
     <>
@@ -140,7 +141,7 @@ export function ThreeRenderTexture({
               resolution={resolution}
               renderTargetOptions={options}
               frameloop={frameloop}
-              frameRequested={frameRequested}
+              isFrameRequested={isFrameRequested}
               clearFrameRequest={clearFrameRequest}
             >
               {children}

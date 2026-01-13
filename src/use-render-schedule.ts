@@ -6,6 +6,10 @@ export function useRenderSchedule() {
   const parentContext = useCanvasTreeOptional();
   const frameRequested = useRef(true);
 
+  function isFrameRequested() {
+    return frameRequested.current;
+  }
+
   function invalidate() {
     frameRequested.current = true;
   }
@@ -16,7 +20,7 @@ export function useRenderSchedule() {
   }
 
   return {
-    frameRequested,
+    isFrameRequested,
     invalidate,
     clearFrameRequest,
   };

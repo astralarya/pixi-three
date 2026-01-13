@@ -139,7 +139,8 @@ function CanvasViewContent({
 
   const [isVisible, setIsVisible] = useState(true);
 
-  const { frameRequested, invalidate, clearFrameRequest } = useRenderSchedule();
+  const { isFrameRequested, invalidate, clearFrameRequest } =
+    useRenderSchedule();
 
   const store = useCanvasTreeStore();
   const { subscribe, updateSnapshot, notifySubscribers } = store;
@@ -226,7 +227,7 @@ function CanvasViewContent({
 
   useTick({
     callback: () => {
-      if (frameloop === "always" || frameRequested.current) {
+      if (frameloop === "always" || isFrameRequested()) {
         render();
         clearFrameRequest();
       }

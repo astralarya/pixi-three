@@ -2,7 +2,6 @@ import { type RootState, useFrame, useThree } from "@react-three/fiber";
 import {
   type ReactNode,
   type Ref,
-  type RefObject,
   useEffect,
   useEffectEvent,
   useImperativeHandle,
@@ -32,8 +31,8 @@ export interface PortalProps {
   postProcessing?: (x: RootState) => PostProcessing;
   /** Frameloop mode: "always" renders every frame, "demand" only renders when frameRequested is true */
   frameloop?: "always" | "demand";
-  /** Ref to check if a frame render is requested (for frameloop="demand") */
-  frameRequested?: RefObject<boolean>;
+  /** Function to check if a frame render is requested (for frameloop="demand") */
+  isFrameRequested?: () => boolean;
   /** Callback to clear the frame request after rendering */
   clearFrameRequest?: () => void;
 }
@@ -49,7 +48,7 @@ export function Portal({
   onTextureUpdate,
   postProcessing,
   frameloop = "always",
-  frameRequested,
+  isFrameRequested,
   clearFrameRequest,
 }: PortalProps) {
   const state = useThree();
@@ -116,7 +115,7 @@ export function Portal({
 
   const postProcessor = postProcessing ? postProcessing(state) : null;
   useFrame(() => {
-    if (frameloop === "always" || frameRequested?.current) {
+    if (frameloop === "always" || isFrameRequested?.()) {
       const gl = state.gl as unknown as WebGPURenderer;
       const oldAutoClear = gl.autoClear;
       const oldXrEnabled = gl.xr.enabled;
