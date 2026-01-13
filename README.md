@@ -8,8 +8,6 @@ Write declarative apps seamlessly blending 2d and 3d components in React.
 npm install @astralarium/pixi-three https://pkg.pr.new/pixijs/pixijs/pixi.js@11816 @pixi/react @react-three/fiber three
 ```
 
-Pixi-Three assumes the `hidden` Tailwind class is available. If not, you may see an extra canvas.
-
 ## Usage
 
 - [`<RenderContext>`](https://astralarium.github.io/pixi-three/functions/RenderContext.html): Context manager for all canvas views, which share GPU resources. Contains DOM children, including CanvasView.

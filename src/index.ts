@@ -1,3 +1,5 @@
+import "./styles.css";
+
 export * from "./canvas-tree-context";
 export * from "./canvas-view";
 export * from "./canvas-view-context";
