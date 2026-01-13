@@ -22,6 +22,16 @@ export const CanvasTreeContext = createContext<CanvasTreeContextValue | null>(
   null,
 );
 
+/**
+ * Return value of {@link useCanvasTree} and {@link useCanvasTreeOptional}.
+ */
+export interface UseCanvasTreeValue {
+  /** The current canvas size and resolution. */
+  size: CanvasViewSize;
+  /** Triggers a re-render of the canvas. */
+  invalidate: () => void;
+}
+
 const noopStore: CanvasTreeStore = {
   subscribe: () => () => {},
   getSnapshot: () => ({ width: 0, height: 0, resolution: 1 }),
@@ -29,6 +39,10 @@ const noopStore: CanvasTreeStore = {
   notifySubscribers: () => {},
 };
 
+/**
+ * Canvas Tree store
+ * @internal
+ */
 export function useCanvasTreeStore(): CanvasTreeStore {
   const subscribers = useRef(new Set<(size: CanvasViewSize) => void>());
   const sizeSnapshot = useRef<CanvasViewSize>({
@@ -60,7 +74,10 @@ export function useCanvasTreeStore(): CanvasTreeStore {
   return storeRef;
 }
 
-export function useCanvasTreeOptional() {
+/**
+ * @returns The canvas tree context if available, or `null` if not within a `<CanvasViewContent />`.
+ */
+export function useCanvasTreeOptional(): UseCanvasTreeValue | null {
   const context = useContext(CanvasTreeContext);
   const store = context?.store ?? noopStore;
   const size = useSyncExternalStore(store.subscribe, store.getSnapshot);
@@ -70,7 +87,11 @@ export function useCanvasTreeOptional() {
   return { size, invalidate: context.invalidate };
 }
 
-export function useCanvasTree() {
+/**
+ * @returns The canvas tree context.
+ * @throws If called outside of a `<CanvasViewContent />`.
+ */
+export function useCanvasTree(): UseCanvasTreeValue {
   const context = useCanvasTreeOptional();
   if (context === null) {
     throw Error(
