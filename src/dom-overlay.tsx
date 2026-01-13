@@ -7,7 +7,6 @@ interface DomOverlayProps {
 }
 
 /**
- * @category component
  * @param props - Component props
  * @expandType DomOverlayProps
  */
