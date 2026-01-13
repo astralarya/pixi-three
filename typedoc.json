@@ -5,7 +5,6 @@
   "tsconfig": "./tsconfig.app.json",
   "name": "@astralarium/pixi-three",
   "readme": "./README.md",
-  "exclude": ["examples"],
   "includeVersion": true,
   "excludePrivate": true,
   "excludeProtected": false,
