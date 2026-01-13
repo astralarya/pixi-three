@@ -2,8 +2,9 @@ import type { PropsWithChildren } from "react";
 import { useState } from "react";
 
 import { BasicScene } from "./scene/basic-scene";
+import { DemandRendering } from "./scene/demand-rendering";
 
-type Tab = "unmounted" | "basic";
+type Tab = "unmounted" | "basic" | "demand";
 
 function App() {
   const [tab, setTab] = useState<Tab>("basic");
@@ -27,12 +28,19 @@ function App() {
           <button className={tabStyle("basic")} onClick={() => setTab("basic")}>
             Basic
           </button>
+          <button
+            className={tabStyle("demand")}
+            onClick={() => setTab("demand")}
+          >
+            Demand
+          </button>
         </div>
       </div>
       {tab === "unmounted" && (
         <CenteredContent>Canvas unmounted</CenteredContent>
       )}
       {tab === "basic" && <BasicScene />}
+      {tab === "demand" && <DemandRendering />}
     </div>
   );
 }

@@ -1,4 +1,10 @@
-import { createContext, useContext, useRef, useSyncExternalStore } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useSyncExternalStore,
+} from "react";
 
 /**
  * @category hook
@@ -90,4 +96,14 @@ export function useViewport(): CanvasViewSize {
 export function useInvalidate(): () => void {
   const context = useContext(CanvasTreeContext);
   return context?.invalidate ?? (() => {});
+}
+
+/**
+ * Hook that invalidates every time the component renders.
+ *
+ * @category hook
+ */
+export function useEffectInvalidate() {
+  const invalidate = useInvalidate();
+  useEffect(invalidate);
 }
