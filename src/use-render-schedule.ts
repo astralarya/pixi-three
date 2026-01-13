@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 import { useCanvasTreeOptional } from "./canvas-tree-context";
 
-export function useDemandRendering() {
+export function useRenderSchedule() {
   const parentContext = useCanvasTreeOptional();
   const frameRequested = useRef(true);
 

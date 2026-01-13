@@ -21,7 +21,7 @@ import {
 import { useCanvasContext } from "./canvas-context-hooks";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
 import { CanvasViewContext as CanvasViewContentContext } from "./canvas-view-context";
-import { useDemandRendering } from "./use-demand-rendering";
+import { useRenderSchedule } from "./use-render-schedule";
 
 extend({ Container });
 
@@ -139,8 +139,7 @@ function CanvasViewContent({
 
   const [isVisible, setIsVisible] = useState(true);
 
-  const { frameRequested, invalidate, clearFrameRequest } =
-    useDemandRendering();
+  const { frameRequested, invalidate, clearFrameRequest } = useRenderSchedule();
 
   const store = useCanvasTreeStore();
   const { subscribe, updateSnapshot, notifySubscribers } = store;

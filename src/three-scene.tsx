@@ -43,7 +43,7 @@ import {
 import { Portal } from "./three-portal";
 import { ThreeSceneContext } from "./three-scene-context";
 import { useBridge } from "./use-bridge";
-import { useDemandRendering } from "./use-demand-rendering";
+import { useRenderSchedule } from "./use-render-schedule";
 
 extend({ Container, Sprite });
 
@@ -277,8 +277,7 @@ function ThreeSceneSpriteInternal({
 
   const sceneTunnel = tunnel();
 
-  const { frameRequested, invalidate, clearFrameRequest } =
-    useDemandRendering();
+  const { frameRequested, invalidate, clearFrameRequest } = useRenderSchedule();
 
   return (
     <>

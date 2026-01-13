@@ -31,7 +31,7 @@ import { PixiTextureContext } from "./pixi-texture-context";
 import { useAttachedObject } from "./three-fiber";
 import { useThreeSceneContext } from "./three-scene-context";
 import { useBridge } from "./use-bridge";
-import { useDemandRendering } from "./use-demand-rendering";
+import { useRenderSchedule } from "./use-render-schedule";
 
 extend({ Container });
 
@@ -145,8 +145,7 @@ function PixiTextureInternal({
   const containerRef = useRef<Container>(null!);
   const pixiTextureRef = useRef(new RenderTexture());
 
-  const { frameRequested, invalidate, clearFrameRequest } =
-    useDemandRendering();
+  const { frameRequested, invalidate, clearFrameRequest } = useRenderSchedule();
 
   function render() {
     app.app.renderer.render({

@@ -27,7 +27,7 @@ import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
 import { useAttachedObject } from "./three-fiber";
 import { Portal } from "./three-portal";
 import { ThreeSceneContext, useThreeSceneContext } from "./three-scene-context";
-import { useDemandRendering } from "./use-demand-rendering";
+import { useRenderSchedule } from "./use-render-schedule";
 
 export interface ThreeRenderTextureProps {
   /** Render Texture Ref */
@@ -121,8 +121,7 @@ export function ThreeRenderTexture({
 
   const sceneTunnel = tunnel();
 
-  const { frameRequested, invalidate, clearFrameRequest } =
-    useDemandRendering();
+  const { frameRequested, invalidate, clearFrameRequest } = useRenderSchedule();
 
   return (
     <>
