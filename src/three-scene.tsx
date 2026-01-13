@@ -55,10 +55,16 @@ export function ThreeSceneRenderer() {
   return <threeSceneTunnel.Out />;
 }
 
-/** @expand */
+/**
+ * @category component
+ * @expand
+ */
 export type ThreeSceneProps = PixiReactElementProps & ThreeSceneBaseProps;
 
-/** @expand */
+/**
+ * @category component
+ * @expand
+ */
 export interface ThreeSceneBaseProps {
   /** Optional width of the texture, defaults to canvas parent bounds */
   width?: number;
@@ -82,13 +88,6 @@ export interface ThreeSceneBaseProps {
   fpsLimit?: number;
   /** Children will be rendered into a portal */
   children: ReactNode;
-}
-
-export interface ThreeSceneSpriteProps extends ThreeSceneBaseProps {
-  /** Three View Sprite Ref */
-  spriteRef: Ref<Sprite>;
-  /** Pixi Container ref*/
-  containerRef: RefObject<Container>;
 }
 
 /**
@@ -142,6 +141,13 @@ export function ThreeScene({
   );
 }
 
+interface ThreeSceneSpriteProps extends ThreeSceneBaseProps {
+  /** Three View Sprite Ref */
+  spriteRef: Ref<Sprite>;
+  /** Pixi Container ref*/
+  containerRef: RefObject<Container>;
+}
+
 function ThreeSceneSprite(props: ThreeSceneSpriteProps) {
   const Bridge = useBridge();
   const { app } = useApplication();
@@ -169,7 +175,7 @@ function ThreeSceneSprite(props: ThreeSceneSpriteProps) {
   );
 }
 
-export interface ThreeSceneSpriteInternalProps extends ThreeSceneSpriteProps {
+interface ThreeSceneSpriteInternalProps extends ThreeSceneSpriteProps {
   /** Pixi Application */
   app: Application<Renderer>;
   /** Pixi Texture Context */

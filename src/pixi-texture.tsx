@@ -47,6 +47,10 @@ export function PixiTextureRenderer() {
   );
 }
 
+/**
+ * @category component
+ * @expand
+ */
 export interface PixiTextureProps extends PropsWithChildren {
   /** TextureNode Ref */
   ref?: Ref<TextureNode>;
@@ -71,7 +75,6 @@ export interface PixiTextureProps extends PropsWithChildren {
 /**
  * @category component
  * @param props
- * @expandType PixiTextureProps
  */
 export function PixiTexture({
   ref,

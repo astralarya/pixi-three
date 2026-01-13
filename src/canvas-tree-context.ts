@@ -1,6 +1,9 @@
 import { createContext, useContext, useRef, useSyncExternalStore } from "react";
 
-/** @expand */
+/**
+ * @category hook
+ * @expand
+ */
 export interface CanvasViewSize {
   width: number;
   height: number;
@@ -14,20 +17,18 @@ interface CanvasTreeStore {
   notifySubscribers: () => void;
 }
 
-/** @expand */
+/** @internal */
 export interface CanvasTreeContextValue {
   store: CanvasTreeStore;
   invalidate: () => void;
 }
 
+/** @internal */
 export const CanvasTreeContext = createContext<CanvasTreeContextValue | null>(
   null,
 );
 
-/**
- * Canvas Tree store
- * @internal
- */
+/** @internal */
 export function useCanvasTreeStore(): CanvasTreeStore {
   const subscribers = useRef(new Set<(size: CanvasViewSize) => void>());
   const sizeSnapshot = useRef<CanvasViewSize>({

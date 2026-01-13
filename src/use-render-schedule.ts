@@ -2,13 +2,12 @@ import { useRef } from "react";
 
 import { useInvalidate } from "./canvas-tree-context";
 
+/** @internal */
 export interface UseRenderScheduleProps {
   fpsLimit?: number;
 }
 
-/**
- * @internal
- */
+/** @internal */
 export function useRenderSchedule({ fpsLimit }: UseRenderScheduleProps = {}) {
   const minFrameTime = fpsLimit ? 1000 / fpsLimit : 0;
   const parentInvalidate = useInvalidate();

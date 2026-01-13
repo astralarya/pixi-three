@@ -19,6 +19,7 @@ import {
 import type WebGPUBackend from "three/src/renderers/webgpu/WebGPUBackend.js";
 import { type PostProcessing, type WebGPURenderer } from "three/webgpu";
 
+/** @internal */
 export interface PortalProps {
   ref?: Ref<RenderTarget>;
   renderPriority: number;
@@ -37,9 +38,7 @@ export interface PortalProps {
   signalFrame?: () => void;
 }
 
-/**
- * @internal
- */
+/** @internal */
 export function Portal({
   ref,
   renderPriority,

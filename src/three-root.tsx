@@ -30,6 +30,10 @@ declare module "@react-three/fiber" {
   interface ThreeElements extends ThreeToJSXElements<typeof THREE> {}
 }
 
+/**
+ * @category component
+ * @expand
+ */
 export interface ThreeRootBaseProps {
   eventSource?: RefObject<HTMLElement | null>;
   /** WebGPURenderer parameters */
@@ -40,11 +44,10 @@ export interface ThreeRootBaseProps {
   onPointerMissed?: (event: MouseEvent) => void;
 }
 
+/** @internal */
 export type ThreeRootProps = ThreeRootBaseProps & PropsWithChildren;
 
-/**
- * @internal
- */
+/** @internal */
 export function ThreeRoot({
   children,
   eventSource,
