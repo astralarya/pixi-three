@@ -77,14 +77,11 @@ export function useCanvasTree(): CanvasViewSize {
 }
 
 /**
- * Hook that returns the invalidate function from the canvas tree context.
- * This triggers a re-render of the canvas when called.
- *
- * Unlike {@link useCanvasTree}, this hook does not subscribe to canvas
- * size changes, preventing unnecessary re-renders.
+ * The invalidate function for nearest canvas tree context.
+ * This triggers a re-render when called.
  *
  * @category hook
- * @returns The invalidate function, or a no-op if not within a canvas tree context
+ * @returns The invalidate function or noop with no context
  */
 export function useInvalidate(): () => void {
   const context = useContext(CanvasTreeContext);
