@@ -17,7 +17,6 @@ function LandingPage({ children }: PropsWithChildren) {
     <div className="flex h-[calc(100svh-3rem)] flex-col items-center">
       <h1 className="relative z-10 mt-[8svh] text-6xl font-bold">
         <span className="text-pixired">Pixi</span>
-        {" + "}
         <span className="text-threeblue">Three</span>
       </h1>
 
