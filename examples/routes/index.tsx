@@ -15,12 +15,18 @@ export const Route = createFileRoute("/")({
 function LandingPage({ children }: PropsWithChildren) {
   return (
     <div className="flex h-[calc(100svh-3rem)] flex-col items-center">
-      <h1 className="relative z-10 mt-[8svh] text-6xl font-bold">
-        <span className="text-pixired">Pixi</span>
-        <span className="text-threeblue">Three</span>
-      </h1>
+      <div className="mt-[8svh] text-center">
+        <h1 className="text-6xl font-bold">
+          <span className="text-pixired">Pixi</span>
+          <span className="text-threeblue">Three</span>
+        </h1>
+        <p className="text-muted-foreground mt-4 max-w-md text-center text-lg">
+          Write declarative apps seamlessly blending 2d and 3d components in
+          React.
+        </p>
+      </div>
 
-      <div className="-mt-[8svh] -mb-[8svh] grow">{children}</div>
+      <div className="-z-10 -mt-[16svh] -mb-[14svh] grow">{children}</div>
 
       <div className="mb-[16svh] flex gap-4">
         <Button size="lg" render={<Link to="/docs" />}>
