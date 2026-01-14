@@ -17,8 +17,8 @@ function LandingPage({ children }: PropsWithChildren) {
     <div className="isolate flex h-[calc(100svh-3rem)] flex-col items-center">
       <div className="mt-[8svh] text-center">
         <h1 className="text-6xl font-bold">
-          <span className="text-pixired">Pixi</span>
-          <span className="text-threeblue">Three</span>
+          <span className="text-pixi-red">Pixi</span>
+          <span className="text-three-blue">Three</span>
         </h1>
         <p className="text-muted-foreground mt-4 max-w-md text-center text-lg">
           Write declarative apps seamlessly blending 2d and 3d components in
@@ -55,7 +55,9 @@ function LandingPageClient() {
               speed={0.25}
               initialColors={{
                 star1: "#049ef4",
+                star1Hover: "#77ceff",
                 star2: "#e91e63",
+                star2Hover: "#fe68a6",
               }}
             />
           </ThreeScene>

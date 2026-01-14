@@ -20,8 +20,8 @@ export function Navigation() {
             render={
               <Link to="/">
                 <p className="text-lg">
-                  <span className="text-pixired font-bold">Pixi</span>
-                  <span className="text-threeblue font-bold">Three</span>
+                  <span className="text-pixi-red font-bold">Pixi</span>
+                  <span className="text-three-blue font-bold">Three</span>
                 </p>
               </Link>
             }
