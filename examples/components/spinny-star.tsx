@@ -34,6 +34,8 @@ export function SpinnyStar({ speed = 1, initialColors }: SpinnyStarProps) {
 
   const [hover1, setHover1] = useState(false);
   const [hover2, setHover2] = useState(false);
+  const [justClicked1, setJustClicked1] = useState(false);
+  const [justClicked2, setJustClicked2] = useState(false);
 
   const star1 = useRef<Graphics>(null!);
   const star2 = useRef<Graphics>(null!);
@@ -95,25 +97,33 @@ export function SpinnyStar({ speed = 1, initialColors }: SpinnyStarProps) {
       <pixiGraphics
         ref={star1}
         eventMode="static"
-        draw={hover1 ? drawStar1_hover : drawStar1}
+        draw={hover1 && !justClicked1 ? drawStar1_hover : drawStar1}
         origin={center}
         onPointerEnter={() => setHover1(true)}
-        onPointerLeave={() => setHover1(false)}
+        onPointerLeave={() => {
+          setHover1(false);
+          setJustClicked1(false);
+        }}
         onPointerDown={() => {
           setStar1Color(randomColor());
           setStar1ColorHover(randomColor());
+          setJustClicked1(true);
         }}
       />
       <pixiGraphics
         ref={star2}
         eventMode="static"
-        draw={hover2 ? drawStar2_hover : drawStar2}
+        draw={hover2 && !justClicked2 ? drawStar2_hover : drawStar2}
         origin={center}
         onPointerEnter={() => setHover2(true)}
-        onPointerLeave={() => setHover2(false)}
+        onPointerLeave={() => {
+          setHover2(false);
+          setJustClicked2(false);
+        }}
         onPointerDown={() => {
           setStar2Color(randomColor());
           setStar2ColorHover(randomColor());
+          setJustClicked2(true);
         }}
       />
     </>
