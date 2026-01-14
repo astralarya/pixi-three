@@ -8,6 +8,7 @@ import type { PropsWithChildren } from "react";
 
 export const Route = createFileRoute("/example")({
   component: ExampleLayout,
+  ssr: false,
 });
 
 function ExampleLayout() {
