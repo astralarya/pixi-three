@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
+import { Navigation } from "./-navigation";
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -36,6 +38,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
       </head>
       <body>
+        <Navigation />
         {children}
         <Scripts />
       </body>

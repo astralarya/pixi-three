@@ -1,0 +1,95 @@
+import { Link } from "@tanstack/react-router";
+
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "#components/ui/navigation-menu";
+
+export function Navigation() {
+  return (
+    <NavigationMenu>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <NavigationMenuLink
+            className={navigationMenuTriggerStyle()}
+            render={
+              <Link to="/">
+                <p className="text-lg">
+                  <span className="text-pixired font-bold">Pixi</span>
+                  {" + "}
+                  <span className="text-threeblue font-bold">Three</span>
+                </p>
+              </Link>
+            }
+          ></NavigationMenuLink>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <NavigationMenuLink
+            className={navigationMenuTriggerStyle()}
+            render={<Link to="/docs">Docs</Link>}
+          ></NavigationMenuLink>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Examples</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-100 gap-3 p-4 md:w-125 md:grid-cols-2">
+              <li>
+                <NavigationMenuLink
+                  closeOnClick
+                  render={
+                    <Link to="/example/basic-scene">
+                      <div className="text-sm font-medium">Basic Scene</div>
+                      <p className="text-muted-foreground line-clamp-2 text-sm">
+                        <span className="text-pixired font-bold">Pixi</span>
+                        {" + "}
+                        <span className="text-threeblue font-bold">
+                          Three
+                        </span>{" "}
+                        integration.
+                      </p>
+                    </Link>
+                  }
+                ></NavigationMenuLink>
+              </li>
+              <li>
+                <NavigationMenuLink
+                  closeOnClick
+                  render={
+                    <Link to="/example/demand-rendering">
+                      <div className="text-sm font-medium">
+                        On-Demand Rendering
+                      </div>
+                      <p className="text-muted-foreground line-clamp-2 text-sm">
+                        Save power on mobile devices
+                      </p>
+                    </Link>
+                  }
+                ></NavigationMenuLink>
+              </li>
+              <li>
+                <NavigationMenuLink
+                  closeOnClick
+                  render={
+                    <Link to="/example/unmounted">
+                      <div className="text-sm font-medium">Unmounted</div>
+                      <p className="text-muted-foreground line-clamp-2 text-sm">
+                        Unmount &lt;RenderContext&gt;
+                      </p>
+                    </Link>
+                  }
+                ></NavigationMenuLink>
+              </li>
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
