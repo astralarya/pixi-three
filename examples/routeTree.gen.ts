@@ -9,9 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ExampleRouteImport } from './routes/example'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExampleUnmountedRouteImport } from './routes/example/unmounted'
+import { Route as ExampleDemandRenderingRouteImport } from './routes/example/demand-rendering'
+import { Route as ExampleBasicSceneRouteImport } from './routes/example/basic-scene'
 
+const ExampleRoute = ExampleRouteImport.update({
+  id: '/example',
+  path: '/example',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
@@ -22,35 +31,89 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExampleUnmountedRoute = ExampleUnmountedRouteImport.update({
+  id: '/unmounted',
+  path: '/unmounted',
+  getParentRoute: () => ExampleRoute,
+} as any)
+const ExampleDemandRenderingRoute = ExampleDemandRenderingRouteImport.update({
+  id: '/demand-rendering',
+  path: '/demand-rendering',
+  getParentRoute: () => ExampleRoute,
+} as any)
+const ExampleBasicSceneRoute = ExampleBasicSceneRouteImport.update({
+  id: '/basic-scene',
+  path: '/basic-scene',
+  getParentRoute: () => ExampleRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/docs': typeof DocsRoute
+  '/example': typeof ExampleRouteWithChildren
+  '/example/basic-scene': typeof ExampleBasicSceneRoute
+  '/example/demand-rendering': typeof ExampleDemandRenderingRoute
+  '/example/unmounted': typeof ExampleUnmountedRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/docs': typeof DocsRoute
+  '/example': typeof ExampleRouteWithChildren
+  '/example/basic-scene': typeof ExampleBasicSceneRoute
+  '/example/demand-rendering': typeof ExampleDemandRenderingRoute
+  '/example/unmounted': typeof ExampleUnmountedRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/docs': typeof DocsRoute
+  '/example': typeof ExampleRouteWithChildren
+  '/example/basic-scene': typeof ExampleBasicSceneRoute
+  '/example/demand-rendering': typeof ExampleDemandRenderingRoute
+  '/example/unmounted': typeof ExampleUnmountedRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/docs'
+  fullPaths:
+    | '/'
+    | '/docs'
+    | '/example'
+    | '/example/basic-scene'
+    | '/example/demand-rendering'
+    | '/example/unmounted'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/docs'
-  id: '__root__' | '/' | '/docs'
+  to:
+    | '/'
+    | '/docs'
+    | '/example'
+    | '/example/basic-scene'
+    | '/example/demand-rendering'
+    | '/example/unmounted'
+  id:
+    | '__root__'
+    | '/'
+    | '/docs'
+    | '/example'
+    | '/example/basic-scene'
+    | '/example/demand-rendering'
+    | '/example/unmounted'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DocsRoute: typeof DocsRoute
+  ExampleRoute: typeof ExampleRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/example': {
+      id: '/example'
+      path: '/example'
+      fullPath: '/example'
+      preLoaderRoute: typeof ExampleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs': {
       id: '/docs'
       path: '/docs'
@@ -65,12 +128,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/example/unmounted': {
+      id: '/example/unmounted'
+      path: '/unmounted'
+      fullPath: '/example/unmounted'
+      preLoaderRoute: typeof ExampleUnmountedRouteImport
+      parentRoute: typeof ExampleRoute
+    }
+    '/example/demand-rendering': {
+      id: '/example/demand-rendering'
+      path: '/demand-rendering'
+      fullPath: '/example/demand-rendering'
+      preLoaderRoute: typeof ExampleDemandRenderingRouteImport
+      parentRoute: typeof ExampleRoute
+    }
+    '/example/basic-scene': {
+      id: '/example/basic-scene'
+      path: '/basic-scene'
+      fullPath: '/example/basic-scene'
+      preLoaderRoute: typeof ExampleBasicSceneRouteImport
+      parentRoute: typeof ExampleRoute
+    }
   }
 }
+
+interface ExampleRouteChildren {
+  ExampleBasicSceneRoute: typeof ExampleBasicSceneRoute
+  ExampleDemandRenderingRoute: typeof ExampleDemandRenderingRoute
+  ExampleUnmountedRoute: typeof ExampleUnmountedRoute
+}
+
+const ExampleRouteChildren: ExampleRouteChildren = {
+  ExampleBasicSceneRoute: ExampleBasicSceneRoute,
+  ExampleDemandRenderingRoute: ExampleDemandRenderingRoute,
+  ExampleUnmountedRoute: ExampleUnmountedRoute,
+}
+
+const ExampleRouteWithChildren =
+  ExampleRoute._addFileChildren(ExampleRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DocsRoute: DocsRoute,
+  ExampleRoute: ExampleRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

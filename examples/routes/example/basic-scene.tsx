@@ -1,9 +1,14 @@
 import { CanvasView, RenderContext, ThreeScene } from "@astralarium/pixi-three";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { SpinnyCube } from "../components/spinny-cube";
-import { SpinnyStar } from "../components/spinny-star";
+import { SpinnyCube } from "../../components/spinny-cube";
+import { SpinnyStar } from "../../components/spinny-star";
 
-export function BasicScene() {
+export const Route = createFileRoute("/example/basic-scene")({
+  component: BasicScene,
+});
+
+function BasicScene() {
   return (
     <RenderContext>
       <CanvasView alpha>
