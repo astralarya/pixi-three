@@ -3,13 +3,12 @@ import { fileURLToPath } from "node:url";
 
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type UserConfig } from "vite";
 import dts from "vite-plugin-dts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// https://vite.dev/config/
-export default defineConfig({
+const sharedConfig = {
   resolve: {
     alias: {
       "@astralarium/pixi-three": resolve(__dirname, "src/index.ts"),
@@ -22,6 +21,29 @@ export default defineConfig({
       },
     }),
     tailwindcss(),
+  ],
+} satisfies UserConfig;
+
+// Pages config - for dev server and building the examples/docs site
+export const pagesConfig = defineConfig({
+  ...sharedConfig,
+  base: "/pixi-three/",
+  publicDir: "dist-typedoc",
+  server: {
+    fs: {
+      allow: [".", "dist-typedoc/docs"],
+    },
+  },
+  build: {
+    outDir: "dist-pages",
+  },
+});
+
+// Library config (default) - for building the npm package
+export default defineConfig({
+  ...sharedConfig,
+  plugins: [
+    ...sharedConfig.plugins,
     dts({ tsconfigPath: "./tsconfig.app.json", exclude: ["examples"] }),
   ],
   build: {

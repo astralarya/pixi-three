@@ -23,13 +23,11 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite",
-    "dev:pages": "concurrently \"typedoc --watch --preserveWatchOutput\" \"vite --config vite.pages.config.ts\"",
+    "dev": "concurrently \"typedoc --watch --preserveWatchOutput\" \"vite --config vite.pages.config.ts\"",
     "build": "tsc -b && vite build && pnpm pack --out pack/%s-%v.tgz",
-    "build:pages": "vite build --config vite.pages.config.ts && typedoc",
+    "build:pages": "typedoc && vite build --config vite.pages.config.ts",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "preview:pages": "vite preview --config vite.pages.config.ts"
+    "preview": "vite preview --config vite.pages.config.ts"
   },
   "exports": {
     ".": {

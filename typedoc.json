@@ -1,7 +1,7 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["./src/index.ts"],
-  "out": "./dist-pages/docs",
+  "out": "./dist-typedoc/docs",
   "tsconfig": "./tsconfig.app.json",
   "name": "@astralarium/pixi-three",
   "readme": "./README.md",
