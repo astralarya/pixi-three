@@ -22,7 +22,7 @@ export const pagesConfig = defineConfig({
       prerender: {
         enabled: true,
         autoStaticPathsDiscovery: true,
-        filter: ({ path }) => path !== "/pixi-three/docs/",
+        filter: ({ path }) => !["/docs", "/pixi-three/docs/"].includes(path),
       },
     }),
     react({
