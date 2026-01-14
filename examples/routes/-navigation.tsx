@@ -48,9 +48,9 @@ export function Navigation() {
                     <Link to="/example/basic-scene">
                       <div className="text-sm font-medium">Basic Scene</div>
                       <p className="text-muted-foreground line-clamp-2 text-sm">
-                        <span className="text-pixired font-bold">Pixi</span>
+                        <span className="text-pixi-red font-bold">Pixi</span>
                         {" + "}
-                        <span className="text-threeblue font-bold">
+                        <span className="text-three-blue font-bold">
                           Three
                         </span>{" "}
                         integration.
