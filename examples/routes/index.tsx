@@ -45,7 +45,14 @@ function LandingPageClient() {
       <RenderContext>
         <CanvasView alpha>
           <ThreeScene>
-            <SpinnyCube size={2.5} speed={0.25} />
+            <SpinnyCube
+              size={2.5}
+              speed={0.25}
+              initialColors={{
+                star1: "#049ef4",
+                star2: "#e91e63",
+              }}
+            />
           </ThreeScene>
         </CanvasView>
       </RenderContext>

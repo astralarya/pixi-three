@@ -1,11 +1,11 @@
 import { useViewport } from "@astralarium/pixi-three";
 import { extend, useTick } from "@pixi/react";
-import { Graphics, Point } from "pixi.js";
+import { type ColorSource, Graphics, Point } from "pixi.js";
 import { useRef, useState } from "react";
 
 extend({ Graphics });
 
-function randomColor() {
+function randomColor(): ColorSource {
   return (
     0xff0000 * Math.random() +
     0x00ff00 * Math.random() +
@@ -14,10 +14,10 @@ function randomColor() {
 }
 
 export interface SpinnyStarColors {
-  star1?: number;
-  star1Hover?: number;
-  star2?: number;
-  star2Hover?: number;
+  star1?: ColorSource;
+  star1Hover?: ColorSource;
+  star2?: ColorSource;
+  star2Hover?: ColorSource;
 }
 
 export interface SpinnyStarProps {
