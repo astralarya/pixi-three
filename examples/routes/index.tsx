@@ -21,8 +21,7 @@ function LandingPage({ children }: PropsWithChildren) {
           <span className="text-three-blue">Three</span>
         </h1>
         <p className="text-muted-foreground mt-4 max-w-md text-center text-lg">
-          Write declarative apps seamlessly blending 2d and 3d components in
-          React.
+          Seamless blending of 2D and 3D components in React.
         </p>
       </div>
 
@@ -30,7 +29,7 @@ function LandingPage({ children }: PropsWithChildren) {
         {children}
       </div>
 
-      <div className="mb-[calc(20svh-5rem)] flex gap-4">
+      <div className="mb-[calc(20svh-4rem)] flex gap-4">
         <Button size="lg" render={<a href="/pixi-three/docs/" />}>
           Docs
         </Button>
