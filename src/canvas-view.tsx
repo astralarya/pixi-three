@@ -18,7 +18,11 @@ import {
   useState,
 } from "react";
 
-import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
+import {
+  CanvasTreeContext,
+  type CanvasViewSize,
+  useCanvasTreeStore,
+} from "./canvas-tree-context";
 import { CanvasViewContext as CanvasViewContentContext } from "./canvas-view-context";
 import { useRenderContext } from "./render-context-hooks";
 import { useRenderSchedule } from "./use-render-schedule";
@@ -179,7 +183,17 @@ function CanvasViewContent({
   });
 
   const store = useCanvasTreeStore();
-  const { subscribe, updateSnapshot, notifySubscribers } = store;
+  const {
+    subscribe,
+    updateSnapshot: updateSnapshot_,
+    notifySubscribers,
+  } = store;
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const updateSnapshot = (update: Partial<CanvasViewSize>) => {
+    console.log("CanvasView updateSnapshot", update);
+    updateSnapshot_(update);
+  };
 
   useEffect(
     () =>
@@ -204,18 +218,24 @@ function CanvasViewContent({
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    let lastWidth = Math.round(canvas.clientWidth);
+    let lastHeight = Math.round(canvas.clientHeight);
     const resizeObserver = new ResizeObserver(([entry]) => {
-      updateSnapshot({
-        width: entry.contentRect.width,
-        height: entry.contentRect.height,
-      });
+      const width = Math.round(entry.contentRect.width);
+      const height = Math.round(entry.contentRect.height);
+      if (width === lastWidth && height === lastHeight) {
+        return;
+      }
+      lastWidth = width;
+      lastHeight = height;
+      updateSnapshot({ width, height });
       notifySubscribers();
     });
     resizeObserver.observe(canvas);
-    if (canvas.clientWidth > 0 && canvas.clientHeight > 0) {
+    if (lastWidth > 0 && lastHeight > 0) {
       updateSnapshot({
-        width: canvas.clientWidth,
-        height: canvas.clientHeight,
+        width: lastWidth,
+        height: lastHeight,
       });
       notifySubscribers();
     }
@@ -293,8 +313,8 @@ function CanvasViewContent({
               return;
             }
             containerRef.current = ref;
-            const width = canvasRef.current.clientWidth;
-            const height = canvasRef.current.clientHeight;
+            const width = Math.round(canvasRef.current.clientWidth);
+            const height = Math.round(canvasRef.current.clientHeight);
             const resolution = window.devicePixelRatio;
             if (width > 0 && height > 0) {
               updateSnapshot({
