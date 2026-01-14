@@ -12,7 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Pages config - for dev server and building the examples/docs site
 export const pagesConfig = defineConfig({
-  base: "/pixi-three/",
+  base: "/pixi-three",
   publicDir: "dist-typedoc",
   plugins: [
     tsConfigPaths({ projects: ["./tsconfig.pages.json"] }),

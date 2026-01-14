@@ -23,6 +23,7 @@
   "navigation": {
     "includeCategories": true
   },
+  "titleLink": "/pixi-three",
   "navigationLinks": {
     "GitHub": "https://github.com/astralarium/pixi-three"
   },
