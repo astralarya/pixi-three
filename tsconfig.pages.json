@@ -5,7 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "#components/*": ["./examples/components/*"],
-      "#lib/*": ["./examples/lib/*"]
+      "#lib/*": ["examples/components/lib/*"]
     }
   },
   "include": ["examples"]

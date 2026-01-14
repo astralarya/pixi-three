@@ -10,14 +10,23 @@ import { SpinnyStar } from "./spinny-star";
 
 extend({ Graphics });
 
-export function SpinnyCube(props: ThreeElements["mesh"]) {
+export interface SpinnyCubeProps {
+  size?: number;
+  speed?: number;
+}
+
+export function SpinnyCube({
+  size = 1,
+  speed = 1,
+  ...props
+}: ThreeElements["mesh"] & SpinnyCubeProps) {
   const ref = useRef<Mesh>(null);
   const [hovered, hover] = useState(false);
   const [clicked, click] = useState(false);
 
   useFrame((_state, delta) => {
-    ref.current!.rotation.x += delta * (hovered ? 0.2 : 1);
-    ref.current!.rotation.y += delta * 0.5 * (hovered ? 0.2 : 1);
+    ref.current!.rotation.x += delta * (hovered ? 0.2 : 1) * speed;
+    ref.current!.rotation.y += delta * 0.5 * (hovered ? 0.2 : 1) * speed;
   });
 
   const pixiTexture = useRef<TextureNode>(null!);
@@ -30,7 +39,7 @@ export function SpinnyCube(props: ThreeElements["mesh"]) {
 
   return (
     <mesh {...props} ref={ref} scale={clicked ? 1.5 : 1} {...eventHandlers}>
-      <boxGeometry args={[1, 1, 1]} />
+      <boxGeometry args={[1 * size, 1 * size, 1 * size]} />
       <meshBasicNodeMaterial>
         <PixiTexture
           ref={pixiTexture}
