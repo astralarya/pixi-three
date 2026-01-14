@@ -78,10 +78,10 @@ export function Navigation() {
                 <NavigationMenuLink
                   closeOnClick
                   render={
-                    <Link to="/example/unmounted">
-                      <div className="text-sm font-medium">Unmounted</div>
+                    <Link to="/example/unmount-context">
+                      <div className="text-sm font-medium">Unmount Context</div>
                       <p className="text-muted-foreground line-clamp-2 text-sm">
-                        Unmount &lt;RenderContext&gt;
+                        Unmount the &lt;RenderContext&gt;
                       </p>
                     </Link>
                   }

@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ExampleRouteImport } from './routes/example'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ExampleUnmountedRouteImport } from './routes/example/unmounted'
+import { Route as ExampleUnmountContextRouteImport } from './routes/example/unmount-context'
 import { Route as ExampleDemandRenderingRouteImport } from './routes/example/demand-rendering'
 import { Route as ExampleBasicSceneRouteImport } from './routes/example/basic-scene'
 
@@ -31,9 +31,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExampleUnmountedRoute = ExampleUnmountedRouteImport.update({
-  id: '/unmounted',
-  path: '/unmounted',
+const ExampleUnmountContextRoute = ExampleUnmountContextRouteImport.update({
+  id: '/unmount-context',
+  path: '/unmount-context',
   getParentRoute: () => ExampleRoute,
 } as any)
 const ExampleDemandRenderingRoute = ExampleDemandRenderingRouteImport.update({
@@ -53,7 +53,7 @@ export interface FileRoutesByFullPath {
   '/example': typeof ExampleRouteWithChildren
   '/example/basic-scene': typeof ExampleBasicSceneRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
-  '/example/unmounted': typeof ExampleUnmountedRoute
+  '/example/unmount-context': typeof ExampleUnmountContextRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +61,7 @@ export interface FileRoutesByTo {
   '/example': typeof ExampleRouteWithChildren
   '/example/basic-scene': typeof ExampleBasicSceneRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
-  '/example/unmounted': typeof ExampleUnmountedRoute
+  '/example/unmount-context': typeof ExampleUnmountContextRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,7 +70,7 @@ export interface FileRoutesById {
   '/example': typeof ExampleRouteWithChildren
   '/example/basic-scene': typeof ExampleBasicSceneRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
-  '/example/unmounted': typeof ExampleUnmountedRoute
+  '/example/unmount-context': typeof ExampleUnmountContextRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,7 +80,7 @@ export interface FileRouteTypes {
     | '/example'
     | '/example/basic-scene'
     | '/example/demand-rendering'
-    | '/example/unmounted'
+    | '/example/unmount-context'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -88,7 +88,7 @@ export interface FileRouteTypes {
     | '/example'
     | '/example/basic-scene'
     | '/example/demand-rendering'
-    | '/example/unmounted'
+    | '/example/unmount-context'
   id:
     | '__root__'
     | '/'
@@ -96,7 +96,7 @@ export interface FileRouteTypes {
     | '/example'
     | '/example/basic-scene'
     | '/example/demand-rendering'
-    | '/example/unmounted'
+    | '/example/unmount-context'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,11 +128,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/example/unmounted': {
-      id: '/example/unmounted'
-      path: '/unmounted'
-      fullPath: '/example/unmounted'
-      preLoaderRoute: typeof ExampleUnmountedRouteImport
+    '/example/unmount-context': {
+      id: '/example/unmount-context'
+      path: '/unmount-context'
+      fullPath: '/example/unmount-context'
+      preLoaderRoute: typeof ExampleUnmountContextRouteImport
       parentRoute: typeof ExampleRoute
     }
     '/example/demand-rendering': {
@@ -155,13 +155,13 @@ declare module '@tanstack/react-router' {
 interface ExampleRouteChildren {
   ExampleBasicSceneRoute: typeof ExampleBasicSceneRoute
   ExampleDemandRenderingRoute: typeof ExampleDemandRenderingRoute
-  ExampleUnmountedRoute: typeof ExampleUnmountedRoute
+  ExampleUnmountContextRoute: typeof ExampleUnmountContextRoute
 }
 
 const ExampleRouteChildren: ExampleRouteChildren = {
   ExampleBasicSceneRoute: ExampleBasicSceneRoute,
   ExampleDemandRenderingRoute: ExampleDemandRenderingRoute,
-  ExampleUnmountedRoute: ExampleUnmountedRoute,
+  ExampleUnmountContextRoute: ExampleUnmountContextRoute,
 }
 
 const ExampleRouteWithChildren =
