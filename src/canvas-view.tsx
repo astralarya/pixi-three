@@ -191,7 +191,6 @@ function CanvasViewContent({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const updateSnapshot = (update: Partial<CanvasViewSize>) => {
-    console.log("CanvasView updateSnapshot", update);
     updateSnapshot_(update);
   };
 
