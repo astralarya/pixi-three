@@ -5,7 +5,7 @@ Create declarative apps with unified composition of 2D and 3D in React.
 ## Installation
 
 ```bash
-npm install @astralarium/pixi-three https://pkg.pr.new/pixijs/pixijs/pixi.js@11816 @pixi/react @react-three/fiber three
+npm i @astralarium/pixi-three https://pkg.pr.new/pixijs/pixijs/pixi.js@9b40b8b @pixi/react @react-three/fiber three
 ```
 
 ## Usage
