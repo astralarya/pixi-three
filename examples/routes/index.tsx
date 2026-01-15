@@ -28,7 +28,7 @@ function LandingPage({ children }: PropsWithChildren) {
         </p>
       </div>
 
-      <div className="-z-10 -mt-[clamp(0rem,10svh+1rem,8rem)] -mb-[clamp(0rem,8svh+0.5rem,8rem)] min-h-0 grow">
+      <div className="-z-10 -mt-[clamp(0rem,10svh+1rem,8rem)] -mb-[clamp(0rem,8svh+0.5rem,8rem)] min-h-0 w-full grow">
         {children}
       </div>
 
