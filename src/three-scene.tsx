@@ -342,11 +342,10 @@ function ThreeSceneSpriteInternal({
     hitArea: { contains(x: number, y: number): boolean } | null,
   ) {
     const currentSprite = sprite.current;
-    const bounds = currentSprite.getLocalBounds();
     currentSprite.hitArea = hitArea && {
       contains(x: number, y: number): boolean {
-        const normalizedX = (x - bounds.x) / bounds.width;
-        const normalizedY = (y - bounds.y) / bounds.height;
+        const normalizedX = x / width;
+        const normalizedY = y / height;
         return hitArea.contains(normalizedX, normalizedY);
       },
     };
