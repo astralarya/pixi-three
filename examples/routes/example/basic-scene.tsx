@@ -15,7 +15,7 @@ function BasicScene() {
   return (
     <Frame
       title="Basic Scene"
-      subtitle="Pixi inside of Three, inside of Pixi!"
+      subtitle="Pixi inside of Three&mdash;inside of Pixi!"
       sourceUrl="https://github.com/astralarium/pixi-three/blob/main/examples/routes/example/basic-scene.tsx"
     >
       <RenderContext>
