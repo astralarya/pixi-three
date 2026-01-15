@@ -231,13 +231,14 @@ function CanvasViewContent({
       const width = Math.round(entry.contentRect.width);
       const height = Math.round(entry.contentRect.height);
       pendingSizeRef.current = { width, height };
+      invalidate();
     });
     resizeObserver.observe(canvas);
 
     return () => {
       resizeObserver.disconnect();
     };
-  }, [canvasRef]);
+  }, [canvasRef, invalidate]);
 
   useEffect(() => {
     let removeListener: (() => void) | null = null;
