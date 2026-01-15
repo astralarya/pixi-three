@@ -8,11 +8,13 @@ import {
   createPortal,
   type DomEvent,
   type RootState,
+  useThree,
 } from "@react-three/fiber";
 import {
   type Application,
   Container,
   ExternalSource,
+  type IHitArea,
   Point,
   type Renderer,
   Sprite,
@@ -28,7 +30,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { type RenderTargetOptions, Scene } from "three";
+import { Raycaster, type RenderTargetOptions, Scene, Vector2 } from "three";
 import { type PostProcessing } from "three/webgpu";
 import tunnel from "tunnel-rat";
 
@@ -331,6 +333,20 @@ function ThreeSceneSpriteInternal({
 
   const sceneTunnel = tunnel();
 
+  function setHitArea(
+    hitArea: { contains(x: number, y: number): boolean } | null,
+  ) {
+    const currentSprite = sprite.current;
+    const bounds = currentSprite.getLocalBounds();
+    currentSprite.hitArea = hitArea && {
+      contains(x: number, y: number): boolean {
+        const normalizedX = (x - bounds.x) / bounds.width;
+        const normalizedY = (y - bounds.y) / bounds.height;
+        return hitArea.contains(normalizedX, normalizedY);
+      },
+    };
+  }
+
   const { isFrameRequested, invalidate, signalFrame } = useRenderSchedule({
     fpsLimit,
   });
@@ -352,6 +368,7 @@ function ThreeSceneSpriteInternal({
               isFrameRequested={isFrameRequested}
               signalFrame={signalFrame}
             >
+              <HitAreaSetup setHitArea={setHitArea} />
               {children}
               <sceneTunnel.Out />
               {/* Without an element that receives pointer events state.pointer will always be 0/0 */}
@@ -371,4 +388,32 @@ function ThreeSceneSpriteInternal({
       </CanvasTreeContext>
     </>
   );
+}
+
+interface HitAreaSetupProps {
+  setHitArea: (hitArea: IHitArea | null) => void;
+}
+
+function HitAreaSetup({ setHitArea }: HitAreaSetupProps) {
+  const { camera, scene } = useThree();
+  const [raycaster] = useState(new Raycaster());
+  const [pointer] = useState(new Vector2());
+
+  useEffect(() => {
+    setHitArea({
+      contains(x: number, y: number): boolean {
+        pointer.set(x * 2 - 1, -(y * 2 - 1));
+        raycaster.setFromCamera(pointer, camera);
+
+        const intersects = raycaster.intersectObjects(scene.children, true);
+        return intersects.length > 0;
+      },
+    });
+
+    return () => {
+      setHitArea(null);
+    };
+  }, [setHitArea, raycaster, pointer, camera, scene]);
+
+  return null;
 }
