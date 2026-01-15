@@ -1,6 +1,6 @@
 # PixiThree
 
-Write declarative apps seamlessly blending 2d and 3d components in React.
+Create declarative apps with unified composition of 2D and 3D in React.
 
 ## Installation
 

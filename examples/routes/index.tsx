@@ -21,7 +21,13 @@ function LandingPage({ children }: PropsWithChildren) {
           <span className="text-three-blue">Three</span>
         </h1>
         <p className="text-muted-foreground mt-4 max-w-md text-center text-lg">
-          Seamless blending of 2D and 3D components in React.
+          <span className="max-sm:hidden">
+            Create declarative apps with unified composition of 2D and 3D in
+            React.
+          </span>
+          <span className="sm:hidden">
+            Unified 2D and 3D composition in React.
+          </span>
         </p>
       </div>
 
