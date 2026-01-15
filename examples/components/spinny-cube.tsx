@@ -4,7 +4,7 @@ import { type ThreeElements, useFrame } from "@react-three/fiber";
 import { Container, Graphics } from "pixi.js";
 import { useRef, useState } from "react";
 import { type Mesh } from "three";
-import { TextureNode } from "three/webgpu";
+import { type TextureNode } from "three/webgpu";
 
 import { SpinnyStar, type SpinnyStarColors } from "./spinny-star";
 

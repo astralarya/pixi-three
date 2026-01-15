@@ -7,7 +7,7 @@ import { type ThreeElements } from "@react-three/fiber";
 import { Container } from "pixi.js";
 import { useRef, useState } from "react";
 import { type Mesh } from "three";
-import { TextureNode } from "three/webgpu";
+import { type TextureNode } from "three/webgpu";
 
 import { HoverBox } from "./hover-box";
 
