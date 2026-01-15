@@ -181,8 +181,14 @@ function CanvasViewContent({
   const store = useCanvasTreeStore();
   const { subscribe, updateSnapshot, notifySubscribers } = store;
 
-  const pendingSizeRef = useRef<{ width: number; height: number } | null>(null);
-  const appliedSizeRef = useRef<{ width: number; height: number } | null>(null);
+  const pendingSizeRef = useRef<{ width: number; height: number }>({
+    width: 1,
+    height: 1,
+  });
+  const appliedSizeRef = useRef<{ width: number; height: number }>({
+    width: 1,
+    height: 1,
+  });
 
   useEffect(
     () =>
@@ -270,21 +276,18 @@ function CanvasViewContent({
 
   useTick({
     callback: () => {
-      const pendingSize = pendingSizeRef.current;
-      const appliedSize = appliedSizeRef.current;
-      if (
-        pendingSize &&
-        (pendingSize.width !== appliedSize?.width ||
-          pendingSize.height !== appliedSize?.height) &&
-        pendingSize.width > 0 &&
-        pendingSize.height > 0
-      ) {
-        appliedSizeRef.current = pendingSize;
-        updateSnapshot(pendingSize);
-        notifySubscribers();
-      }
-
       if (frameloop === "always" || isFrameRequested()) {
+        const pendingSize = pendingSizeRef.current;
+        const appliedSize = appliedSizeRef.current;
+        if (
+          pendingSize.width !== appliedSize.width ||
+          pendingSize.height !== appliedSize.height
+        ) {
+          appliedSizeRef.current = pendingSize;
+          updateSnapshot(pendingSize);
+          notifySubscribers();
+        }
+
         render();
         signalFrame();
       }
