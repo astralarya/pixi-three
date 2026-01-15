@@ -259,6 +259,8 @@ function ThreeSceneSpriteInternal({
     })(),
   );
 
+  useImperativeHandle(spriteRef, () => sprite.current, []);
+
   const changedSize = useRef(false);
 
   useEffect(() => {
@@ -273,7 +275,6 @@ function ThreeSceneSpriteInternal({
       changedSize.current = false;
     }
   }
-  useImperativeHandle(spriteRef, () => sprite.current, []);
 
   const clientPos = new Point();
   const globalPos = new Point();
