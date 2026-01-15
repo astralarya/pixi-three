@@ -206,6 +206,8 @@ function CanvasViewContent({
     const canvas = canvasRef.current;
     let lastWidth = Math.round(canvas.clientWidth);
     let lastHeight = Math.round(canvas.clientHeight);
+    let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+
     const resizeObserver = new ResizeObserver(([entry]) => {
       const width = Math.round(entry.contentRect.width);
       const height = Math.round(entry.contentRect.height);
@@ -214,8 +216,15 @@ function CanvasViewContent({
       }
       lastWidth = width;
       lastHeight = height;
-      updateSnapshot({ width, height });
-      notifySubscribers();
+
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
+      debounceTimeout = setTimeout(() => {
+        debounceTimeout = null;
+        updateSnapshot({ width: lastWidth, height: lastHeight });
+        notifySubscribers();
+      }, 5);
     });
     resizeObserver.observe(canvas);
     if (lastWidth > 0 && lastHeight > 0) {
@@ -226,6 +235,9 @@ function CanvasViewContent({
       notifySubscribers();
     }
     return () => {
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
       resizeObserver.disconnect();
     };
   }, [canvasRef, renderTargetRef, notifySubscribers, updateSnapshot]);
