@@ -181,6 +181,9 @@ function CanvasViewContent({
   const store = useCanvasTreeStore();
   const { subscribe, updateSnapshot, notifySubscribers } = store;
 
+  const pendingSizeRef = useRef<{ width: number; height: number } | null>(null);
+  const appliedSizeRef = useRef<{ width: number; height: number } | null>(null);
+
   useEffect(
     () =>
       subscribe((size) => {
@@ -204,43 +207,21 @@ function CanvasViewContent({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    let lastWidth = Math.round(canvas.clientWidth);
-    let lastHeight = Math.round(canvas.clientHeight);
-    let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+    const width = Math.round(canvas.clientWidth);
+    const height = Math.round(canvas.clientHeight);
+    pendingSizeRef.current = { width, height };
 
     const resizeObserver = new ResizeObserver(([entry]) => {
       const width = Math.round(entry.contentRect.width);
       const height = Math.round(entry.contentRect.height);
-      if (width === lastWidth && height === lastHeight) {
-        return;
-      }
-      lastWidth = width;
-      lastHeight = height;
-
-      if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
-      }
-      debounceTimeout = setTimeout(() => {
-        debounceTimeout = null;
-        updateSnapshot({ width: lastWidth, height: lastHeight });
-        notifySubscribers();
-      }, 5);
+      pendingSizeRef.current = { width, height };
     });
     resizeObserver.observe(canvas);
-    if (lastWidth > 0 && lastHeight > 0) {
-      updateSnapshot({
-        width: lastWidth,
-        height: lastHeight,
-      });
-      notifySubscribers();
-    }
+
     return () => {
-      if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
-      }
       resizeObserver.disconnect();
     };
-  }, [canvasRef, renderTargetRef, notifySubscribers, updateSnapshot]);
+  }, [canvasRef]);
 
   useEffect(() => {
     let removeListener: (() => void) | null = null;
@@ -289,6 +270,20 @@ function CanvasViewContent({
 
   useTick({
     callback: () => {
+      const pendingSize = pendingSizeRef.current;
+      const appliedSize = appliedSizeRef.current;
+      if (
+        pendingSize &&
+        (pendingSize.width !== appliedSize?.width ||
+          pendingSize.height !== appliedSize?.height) &&
+        pendingSize.width > 0 &&
+        pendingSize.height > 0
+      ) {
+        appliedSizeRef.current = pendingSize;
+        updateSnapshot(pendingSize);
+        notifySubscribers();
+      }
+
       if (frameloop === "always" || isFrameRequested()) {
         render();
         signalFrame();
