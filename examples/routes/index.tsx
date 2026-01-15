@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
 function LandingPage({ children }: PropsWithChildren) {
   return (
     <div className="isolate flex h-[calc(100svh-3rem)] flex-col items-center">
-      <div className="mx-2 mt-[clamp(0rem,14svh-2rem,8rem)] text-center">
+      <div className="mx-2 mt-[clamp(0rem,10svh-2rem,8rem)] text-center">
         <h1 className="text-[clamp(2.5rem,12svh,4rem)] font-bold [@media(max-height:400px)]:hidden">
           <span className="text-pixi-red">Pixi</span>
           <span className="text-three-blue">Three</span>
@@ -28,11 +28,11 @@ function LandingPage({ children }: PropsWithChildren) {
         </p>
       </div>
 
-      <div className="-z-10 -my-[clamp(0.1rem,14svh,8rem)] min-h-0 grow">
+      <div className="-z-10 -mt-[clamp(0rem,10svh+1rem,8rem)] -mb-[clamp(0rem,8svh+0.5rem,8rem)] min-h-0 grow">
         {children}
       </div>
 
-      <div className="mt-[clamp(0.1rem,10svh-2rem,2rem)] mb-[clamp(0.1rem,14svh-2rem,8rem)] flex gap-4">
+      <div className="mb-[clamp(0.1rem,12svh-2rem,8rem)] flex gap-4">
         <Button size="lg" render={<a href="/pixi-three/docs/" />}>
           Docs
         </Button>
