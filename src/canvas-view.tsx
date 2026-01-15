@@ -18,11 +18,7 @@ import {
   useState,
 } from "react";
 
-import {
-  CanvasTreeContext,
-  type CanvasViewSize,
-  useCanvasTreeStore,
-} from "./canvas-tree-context";
+import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
 import { CanvasViewContext as CanvasViewContentContext } from "./canvas-view-context";
 import { useRenderContext } from "./render-context-hooks";
 import { useRenderSchedule } from "./use-render-schedule";
@@ -183,16 +179,7 @@ function CanvasViewContent({
   });
 
   const store = useCanvasTreeStore();
-  const {
-    subscribe,
-    updateSnapshot: updateSnapshot_,
-    notifySubscribers,
-  } = store;
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const updateSnapshot = (update: Partial<CanvasViewSize>) => {
-    updateSnapshot_(update);
-  };
+  const { subscribe, updateSnapshot, notifySubscribers } = store;
 
   useEffect(
     () =>
@@ -241,7 +228,7 @@ function CanvasViewContent({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [canvasRef, renderTargetRef, updateSnapshot, notifySubscribers]);
+  }, [canvasRef, renderTargetRef, notifySubscribers, updateSnapshot]);
 
   useEffect(() => {
     let removeListener: (() => void) | null = null;
@@ -259,7 +246,7 @@ function CanvasViewContent({
     return () => {
       removeListener?.();
     };
-  }, [canvasRef, updateSnapshot, notifySubscribers]);
+  }, [canvasRef, notifySubscribers, updateSnapshot]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
