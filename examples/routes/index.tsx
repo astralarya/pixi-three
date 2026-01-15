@@ -16,7 +16,7 @@ function LandingPage({ children }: PropsWithChildren) {
   return (
     <div className="isolate mt-[max(0rem,30svh-16rem)] flex h-[clamp(0rem,100svh-2.5rem,48rem)] flex-col items-center overflow-clip">
       <div className="mx-2 text-center">
-        <h1 className="text-[clamp(2.5rem,min(24svh-4rem,14svw),8rem)] font-bold [@media(max-height:400px)]:hidden [@media(max-width:400px)]:hidden">
+        <h1 className="mt-6 text-[clamp(2.5rem,min(24svh-4rem,14svw),8rem)] font-bold [@media(max-height:400px)]:hidden [@media(max-width:250px)]:hidden">
           <span className="text-pixi-red">Pixi</span>
           <span className="text-three-blue">Three</span>
         </h1>
@@ -27,7 +27,7 @@ function LandingPage({ children }: PropsWithChildren) {
 
       <div className="-z-10 -mt-16 -mb-16 min-h-0 w-full grow">{children}</div>
 
-      <div className="mb-1 flex gap-4 pb-4 [@media(max-width:200px)]:flex-col">
+      <div className="mb-4 flex gap-4 pb-4 [@media(max-width:200px)]:flex-col">
         <Button size="lg" render={<a href="/pixi-three/docs/" />}>
           Docs
         </Button>
