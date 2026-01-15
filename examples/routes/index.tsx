@@ -15,27 +15,24 @@ export const Route = createFileRoute("/")({
 function LandingPage({ children }: PropsWithChildren) {
   return (
     <div className="isolate flex h-[calc(100svh-3rem)] flex-col items-center">
-      <div className="mx-2 mt-[calc(18svh-5rem)] text-center">
-        <h1 className="text-6xl font-bold">
+      <div className="mx-2 mt-[clamp(0rem,14svh-2rem,8rem)] text-center">
+        <h1 className="text-[clamp(2.5rem,12svh,4rem)] font-bold [@media(max-height:400px)]:hidden">
           <span className="text-pixi-red">Pixi</span>
           <span className="text-three-blue">Three</span>
         </h1>
-        <p className="text-muted-foreground mt-4 max-w-md text-center text-lg">
+        <p className="text-muted-foreground mt-[clamp(0rem,2svh,1rem)] max-w-md text-center text-[clamp(0.875rem,2.5svh,1.125rem)] [@media(max-height:600px)]:hidden">
           <span className="max-sm:hidden">
-            Create declarative apps with unified composition of 2D and 3D in
-            React.
+            Declarative composition of 2D and 3D in React.
           </span>
-          <span className="sm:hidden">
-            Unified 2D and 3D composition in React.
-          </span>
+          <span className="sm:hidden">Declarative 2D and 3D in React.</span>
         </p>
       </div>
 
-      <div className="-z-10 -mt-[14svh] -mb-[14svh] min-h-0 grow">
+      <div className="-z-10 -my-[clamp(0.1rem,14svh,8rem)] min-h-0 grow">
         {children}
       </div>
 
-      <div className="mb-[calc(20svh-4rem)] flex gap-4">
+      <div className="mt-[clamp(0.1rem,10svh-2rem,2rem)] mb-[clamp(0.1rem,14svh-2rem,8rem)] flex gap-4">
         <Button size="lg" render={<a href="/pixi-three/docs/" />}>
           Docs
         </Button>
