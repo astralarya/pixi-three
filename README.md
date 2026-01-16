@@ -2,6 +2,10 @@
 
 Create declarative apps with unified composition of 2D and 3D in React.
 
+[Docs](https://astralarium.github.io/pixi-three/)
+| [Github](https://github.com/astralarium/pixi-three)
+| [NPM](https://www.npmjs.com/package/@astralarium/pixi-three)
+
 ## Installation
 
 ```bash
