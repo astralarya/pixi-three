@@ -58,6 +58,11 @@ const EXAMPLE_LINKS = [
     to: "/example/unmount-context",
     description: "Unmount the <RenderContext>",
   },
+  {
+    label: "Video Preview",
+    to: "/example/video-preview",
+    description: "Preview transparent video",
+  },
 ] as const satisfies readonly NavLink[];
 
 export function Navigation() {
