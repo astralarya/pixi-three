@@ -4,6 +4,7 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.pages.tsbuildinfo",
     "baseUrl": ".",
     "paths": {
+      "@astralarium/pixi-three": ["./src/index.ts"],
       "#components/*": ["./examples/components/*"],
       "#lib/*": ["examples/components/lib/*"]
     }
