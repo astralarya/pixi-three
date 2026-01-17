@@ -1,5 +1,6 @@
 import { CanvasView, RenderContext, ThreeScene } from "@astralarium/pixi-three";
 import { createFileRoute } from "@tanstack/react-router";
+import { useRef } from "react";
 
 import { FadeIn } from "#components/fade-in";
 import { SpinnyCube } from "#components/spinny-cube";
@@ -12,14 +13,17 @@ export const Route = createFileRoute("/example/basic-scene")({
 });
 
 function BasicScene() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   return (
     <Frame
       title="Basic Scene"
       subtitle="Pixi inside of Three&mdash;inside of Pixi!"
       sourceUrl="https://github.com/astralarium/pixi-three/blob/main/examples/routes/example/basic-scene.tsx"
+      canvasRef={canvasRef}
     >
       <RenderContext>
-        <CanvasView alpha>
+        <CanvasView alpha canvasRef={canvasRef}>
           <FadeIn>
             <SpinnyStar
               alpha={0.1}

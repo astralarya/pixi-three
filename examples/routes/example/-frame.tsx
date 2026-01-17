@@ -1,7 +1,12 @@
 import { LinkIcon } from "lucide-react";
 import * as React from "react";
 
+import {
+  createDownloadHandler,
+  useCanvasRecorder,
+} from "#components/hooks/use-canvas-recorder";
 import { cn } from "#components/lib/utils";
+import { Button } from "#components/ui/button";
 
 interface FrameProps {
   children: React.ReactNode;
@@ -9,6 +14,7 @@ interface FrameProps {
   subtitle?: string;
   sourceUrl?: string;
   className?: string;
+  canvasRef?: React.RefObject<HTMLCanvasElement | null>;
 }
 
 export function Frame({
@@ -17,6 +23,7 @@ export function Frame({
   subtitle,
   sourceUrl,
   className,
+  canvasRef,
 }: FrameProps) {
   return (
     <div className={cn("flex flex-1 flex-col", className)}>
@@ -36,6 +43,33 @@ export function Frame({
         )}
       </header>
       {children}
+      {canvasRef && <RecordButton canvasRef={canvasRef} title={title} />}
     </div>
+  );
+}
+
+function RecordButton({
+  canvasRef,
+  title,
+}: {
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  title: string;
+}) {
+  const { startRecording, stopRecording, isRecording } = useCanvasRecorder(
+    canvasRef,
+    {
+      onComplete: createDownloadHandler(title),
+    },
+  );
+
+  return (
+    <Button
+      size="sm"
+      variant={isRecording ? "destructive" : "secondary"}
+      onClick={isRecording ? stopRecording : startRecording}
+      className="fixed right-4 bottom-4"
+    >
+      {isRecording ? "Stop Recording" : "Record"}
+    </Button>
   );
 }
