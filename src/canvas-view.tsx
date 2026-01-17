@@ -51,6 +51,10 @@ export interface CanvasViewProps extends PropsWithChildren {
   transform?: Matrix;
   /** Optional FPS limit */
   fpsLimit?: number;
+  /** Callback invoked after each frame renders. Useful for recording integration. */
+  onRender?: () => void;
+  /** Optional ref to the canvas element. Useful for recording with useCanvasRecorder. */
+  canvasRef?: RefObject<HTMLCanvasElement | null>;
 }
 
 /**
@@ -82,10 +86,13 @@ export function CanvasView({
   resolution = window.devicePixelRatio,
   transform = new Matrix(),
   fpsLimit,
+  onRender,
+  canvasRef: canvasRefProp,
 }: CanvasViewProps) {
   const id = useId();
   const { tunnel, pixiDomEvents } = useRenderContext();
   const canvasRef = useRef<HTMLCanvasElement>(null!);
+  useImperativeHandle(canvasRefProp, () => canvasRef.current);
   const containerRef = useRef<Container>(null!);
   const renderTargetRef = useRef<RenderTarget>(null!);
 
@@ -146,6 +153,7 @@ export function CanvasView({
           transform={transform}
           frameloop={frameloop}
           fpsLimit={fpsLimit}
+          onRender={onRender}
         >
           {children}
         </CanvasViewContent>
@@ -167,6 +175,8 @@ interface CanvasViewContentProps extends PropsWithChildren {
   frameloop: "always" | "demand";
   /** Optional FPS limit */
   fpsLimit?: number;
+  /** Callback invoked after each frame renders */
+  onRender?: () => void;
 }
 
 function CanvasViewContent({
@@ -176,6 +186,7 @@ function CanvasViewContent({
   transform,
   frameloop,
   fpsLimit,
+  onRender,
   children,
 }: CanvasViewContentProps) {
   const app = useApplication();
@@ -300,6 +311,7 @@ function CanvasViewContent({
         }
 
         render();
+        onRender?.();
         signalFrame();
       }
     },
