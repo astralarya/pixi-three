@@ -41,3 +41,5 @@ npm i @astralarium/pixi-three https://pkg.pr.new/pixijs/pixijs/pixi.js@9b40b8b @
 pnpm install
 pnpm dev
 ```
+
+This project uses React Compiler.
