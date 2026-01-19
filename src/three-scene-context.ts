@@ -17,13 +17,13 @@ export interface ThreeSceneContextValue {
    * @param point - Pixi Point in local coordinates
    * @param ndc - Vector2 to store the NDC result
    */
-  mapPointToNdc: (point: Point, ndc: Vector2) => void;
+  mapPixiToNdc: (point: Point, ndc: Vector2) => void;
   /**
    * Maps Three.js NDC coordinates (-1 to 1) to a Pixi Point (in local sprite coordinates).
    * @param ndc - Vector2 with NDC coordinates
    * @param point - Pixi Point to store the result
    */
-  mapNdcToPoint: (ndc: Vector2, point: Point) => void;
+  mapNdcToPixi: (ndc: Vector2, point: Point) => void;
 }
 
 /** @internal */

@@ -20,7 +20,7 @@ import { type Vector2 } from "three";
  * @param point - The Pixi Point to store the result
  * @param bounds - The bounds to map within (width/height and optional x/y offset)
  */
-export function mapUvToPoint(
+export function mapUvToPixi(
   uv: Vector2,
   point: Point,
   bounds:
@@ -41,7 +41,7 @@ export function mapUvToPoint(
  * @param uv - Three.js UV Vector2 to store the result
  * @param bounds - The bounds to map within
  */
-export function mapPointToUv(
+export function mapPixiToUv(
   point: Point,
   uv: Vector2,
   bounds:
@@ -85,7 +85,7 @@ export function mapPointToNdc(
  * @param point - The Pixi Point to store the result
  * @param bounds - The bounds to map within
  */
-export function mapNdcToPoint(
+export function mapNdcToPixi(
   ndc: Vector2,
   point: Point,
   bounds:

@@ -5,8 +5,8 @@ import { type Object3D, type Vector2 } from "three";
 import type tunnel from "tunnel-rat";
 
 import {
-  mapPointToUv as mapPointToUvUtil,
-  mapUvToPoint as mapUvToPointUtil,
+  mapPixiToUv as mapPixiToUvUtil,
+  mapUvToPixi as mapUvToPixiUtil,
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
 import { useCanvasView } from "./canvas-view-context";
@@ -32,13 +32,13 @@ export interface PixiTextureContextValue {
    * @param uv - Three.js UV Vector2 (0-1 range)
    * @param point - Pixi Point to store the result
    */
-  mapUvToPoint: (uv: Vector2, point: Point) => void;
+  mapUvToPixi: (uv: Vector2, point: Point) => void;
   /**
    * Maps Pixi texture coordinates to Three.js UV coordinates (0-1).
    * @param point - Pixi Point in texture space
    * @param uv - Three.js UV Vector2 to store the result
    */
-  mapPointToUv: (point: Point, uv: Vector2) => void;
+  mapPixiToUv: (point: Point, uv: Vector2) => void;
 }
 
 /** @internal */
@@ -75,13 +75,13 @@ export interface PixiContextBijections {
    * @param uv - Three.js UV Vector2 (0-1 range)
    * @param point - Pixi Point to store the result
    */
-  mapUvToPoint: (uv: Vector2, point: Point) => void;
+  mapUvToPixi: (uv: Vector2, point: Point) => void;
   /**
    * Maps Pixi coordinates to Three.js UV coordinates (0-1).
    * @param point - Pixi Point in local coordinates
    * @param uv - Three.js UV Vector2 to store the result
    */
-  mapPointToUv: (point: Point, uv: Vector2) => void;
+  mapPixiToUv: (point: Point, uv: Vector2) => void;
 }
 
 /**
@@ -103,8 +103,8 @@ export function usePixiContext(): PixiContextBijections {
     return {
       width: textureContext.width,
       height: textureContext.height,
-      mapUvToPoint: textureContext.mapUvToPoint,
-      mapPointToUv: textureContext.mapPointToUv,
+      mapUvToPixi: textureContext.mapUvToPixi,
+      mapPixiToUv: textureContext.mapPixiToUv,
     };
   }
 
@@ -112,10 +112,10 @@ export function usePixiContext(): PixiContextBijections {
   return {
     width: viewport.width,
     height: viewport.height,
-    mapUvToPoint: (uv: Vector2, point: Point) =>
-      mapUvToPointUtil(uv, point, bounds),
-    mapPointToUv: (point: Point, uv: Vector2) =>
-      mapPointToUvUtil(point, uv, bounds),
+    mapUvToPixi: (uv: Vector2, point: Point) =>
+      mapUvToPixiUtil(uv, point, bounds),
+    mapPixiToUv: (point: Point, uv: Vector2) =>
+      mapPixiToUvUtil(point, uv, bounds),
   };
 }
 

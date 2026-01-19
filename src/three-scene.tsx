@@ -35,8 +35,8 @@ import { type PostProcessing } from "three/webgpu";
 import tunnel from "tunnel-rat";
 
 import {
-  mapNdcToPoint as mapNdcToPointUtil,
-  mapPointToNdc as mapPointToNdcUtil,
+  mapNdcToPixi as mapNdcToPixiUtil,
+  mapPixiToNdc as mapPixiToNdcUtil,
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
@@ -280,12 +280,12 @@ function ThreeSceneSpriteInternal({
     }
   }
 
-  function mapPointToNdc(point: Point, ndc: Vector2) {
-    mapPointToNdcUtil(point, ndc, sprite.current.getLocalBounds());
+  function mapPixiToNdc(point: Point, ndc: Vector2) {
+    mapPixiToNdcUtil(point, ndc, sprite.current.getLocalBounds());
   }
 
-  function mapNdcToPoint(ndc: Vector2, point: Point) {
-    mapNdcToPointUtil(ndc, point, sprite.current.getLocalBounds());
+  function mapNdcToPixi(ndc: Vector2, point: Point) {
+    mapNdcToPixiUtil(ndc, point, sprite.current.getLocalBounds());
   }
 
   const clientPos = new Point();
@@ -316,7 +316,7 @@ function ThreeSceneSpriteInternal({
       if (!uv) {
         return false;
       }
-      pixiTextureContext.mapUvToPoint(uv, globalPos);
+      pixiTextureContext.mapUvToPixi(uv, globalPos);
       if (
         sprite.current !== pixiTextureContext.hitTest(globalPos.x, globalPos.y)
       ) {
@@ -338,7 +338,7 @@ function ThreeSceneSpriteInternal({
     }
 
     sprite.current.toLocal(globalPos, undefined, localPos);
-    mapPointToNdc(localPos, state.pointer);
+    mapPixiToNdc(localPos, state.pointer);
     state.raycaster.setFromCamera(state.pointer, state.camera);
   }
 
@@ -369,8 +369,8 @@ function ThreeSceneSpriteInternal({
           value={{
             containerRef,
             sceneTunnel,
-            mapPointToNdc,
-            mapNdcToPoint,
+            mapPixiToNdc,
+            mapNdcToPixi,
           }}
         >
           {createPortal(

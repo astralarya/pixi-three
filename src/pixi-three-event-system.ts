@@ -12,7 +12,7 @@ import {
 } from "pixi.js";
 import type { RefObject } from "react";
 
-import { mapUvToPoint } from "./bijections";
+import { mapUvToPixi } from "./bijections";
 import {
   type EventGuard,
   MISSED_POINT,
@@ -75,7 +75,7 @@ export class PixiThreeEventSystem extends PixiSyntheticEventSystem<
       eventBoundary.rootTarget.hitArea instanceof Rectangle
         ? eventBoundary.rootTarget.hitArea
         : eventBoundary.rootTarget.getBounds();
-    mapUvToPoint(uv, point, bounds);
+    mapUvToPixi(uv, point, bounds);
   }
 
   /**

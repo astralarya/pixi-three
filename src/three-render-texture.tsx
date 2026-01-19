@@ -25,8 +25,8 @@ import {
 import tunnel from "tunnel-rat";
 
 import {
-  mapNdcToPoint as mapNdcToPointUtil,
-  mapPointToNdc as mapPointToNdcUtil,
+  mapNdcToPixi as mapNdcToPixiUtil,
+  mapPixiToNdc as mapPixiToNdcUtil,
   mapUvToNdc,
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
@@ -143,12 +143,12 @@ export function ThreeRenderTexture({
 
   const bounds = { width, height };
 
-  function mapPointToNdc(point: Point, ndc: Vector2) {
-    mapPointToNdcUtil(point, ndc, bounds);
+  function mapPixiToNdc(point: Point, ndc: Vector2) {
+    mapPixiToNdcUtil(point, ndc, bounds);
   }
 
-  function mapNdcToPoint(ndc: Vector2, point: Point) {
-    mapNdcToPointUtil(ndc, point, bounds);
+  function mapNdcToPixi(ndc: Vector2, point: Point) {
+    mapNdcToPixiUtil(ndc, point, bounds);
   }
 
   function computeFn(event: DomEvent, state: RootState, previous?: RootState) {
@@ -192,8 +192,8 @@ export function ThreeRenderTexture({
           value={{
             containerRef,
             sceneTunnel,
-            mapPointToNdc,
-            mapNdcToPoint,
+            mapPixiToNdc,
+            mapNdcToPixi,
           }}
         >
           {createPortal(
