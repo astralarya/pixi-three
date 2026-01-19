@@ -11,7 +11,7 @@ export interface FadeInProps {
 }
 
 export function FadeIn({
-  duration = 1000,
+  duration = 500,
   children,
   ...props
 }: FadeInProps & Partial<ComponentProps<"pixiContainer">>) {
