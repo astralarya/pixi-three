@@ -1,4 +1,4 @@
-import { LinkIcon } from "lucide-react";
+import { BoxIcon, LinkIcon } from "lucide-react";
 import * as React from "react";
 
 import {
@@ -31,15 +31,26 @@ export function Frame({
         <h1 className="text-xl font-semibold">{title}</h1>
         {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
         {sourceUrl && (
-          <a
-            href={sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground ml-auto flex items-center gap-1 text-sm hover:underline"
-          >
-            <LinkIcon className="h-4 w-4" />
-            Source
-          </a>
+          <div className="ml-auto flex items-center gap-4">
+            <a
+              href={sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground flex items-center gap-1 text-sm hover:underline"
+            >
+              <LinkIcon className="h-4 w-4" />
+              Source
+            </a>
+            <a
+              href={`https://codesandbox.io/p/github/astralarium/pixi-three/main?file=${encodeURIComponent("/" + sourceUrl.split("/blob/main/")[1])}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground flex items-center gap-1 text-sm hover:underline"
+            >
+              <BoxIcon className="h-4 w-4" />
+              CodeSandbox
+            </a>
+          </div>
         )}
       </header>
       {children}
