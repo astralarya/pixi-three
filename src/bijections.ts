@@ -62,7 +62,7 @@ export function mapPixiToUv(
  * @param ndc - Vector2 to store the NDC result
  * @param bounds - The bounds to normalize within
  */
-export function mapPointToNdc(
+export function mapPixiToNdc(
   point: Point,
   ndc: Vector2,
   bounds:
