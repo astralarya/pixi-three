@@ -1,33 +1,39 @@
 import { PixiTexture, usePixiTextureEvents } from "@astralarium/pixi-three";
-import { extend } from "@pixi/react";
 import { type ThreeElements, useFrame } from "@react-three/fiber";
-import { Container, Graphics } from "pixi.js";
-import { useRef, useState } from "react";
+import { Container } from "pixi.js";
+import {
+  type ReactNode,
+  type Ref,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { type Mesh } from "three";
 import { type TextureNode } from "three/webgpu";
-
-import { SpinnyStar, type SpinnyStarColors } from "./spinny-star";
-
-extend({ Graphics });
 
 export interface SpinnyCubeProps {
   size?: number;
   speed?: number;
-  initialColors?: SpinnyStarColors;
+  children?: ReactNode;
 }
 
 export function SpinnyCube({
   size = 1,
   speed = 1,
-  initialColors,
+  children,
+  ref,
   ...props
 }: ThreeElements["mesh"] & SpinnyCubeProps) {
-  const ref = useRef<Mesh>(null);
+  const meshRef = useRef<Mesh>(null!);
   const [hovered, hover] = useState(false);
 
+  useImperativeHandle(ref as Ref<Mesh>, () => meshRef.current!, []);
+
   useFrame((_state, delta) => {
-    ref.current!.rotation.x += delta * (hovered ? 0.2 : 1) * speed;
-    ref.current!.rotation.y += delta * 0.5 * (hovered ? 0.2 : 1) * speed;
+    if (meshRef.current) {
+      meshRef.current.rotation.x += delta * (hovered ? 0.2 : 1) * speed;
+      meshRef.current.rotation.y += delta * 0.5 * (hovered ? 0.2 : 1) * speed;
+    }
   });
 
   const pixiTexture = useRef<TextureNode>(null!);
@@ -38,7 +44,7 @@ export function SpinnyCube({
   });
 
   return (
-    <mesh {...props} ref={ref} {...eventHandlers}>
+    <mesh {...props} ref={meshRef} {...eventHandlers}>
       <boxGeometry args={[1 * size, 1 * size, 1 * size]} />
       <meshBasicNodeMaterial>
         <PixiTexture
@@ -49,7 +55,7 @@ export function SpinnyCube({
           attach="colorNode"
           frameloop="always"
         >
-          <SpinnyStar speed={speed} initialColors={initialColors} />
+          {children}
         </PixiTexture>
       </meshBasicNodeMaterial>
     </mesh>

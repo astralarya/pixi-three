@@ -3,7 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 
 import { FadeIn } from "#components/fade-in";
-import { SpinnyCube } from "#components/spinny-cube";
+import { SpinnyCubeWithStars } from "#components/spinny-cube-with-stars";
+import { PIXI_THREE_STAR } from "#components/spinny-star";
 import { SpinnyStar } from "#components/spinny-star";
 
 import { Frame } from "./-frame";
@@ -28,21 +29,18 @@ function BasicScene() {
             <SpinnyStar
               alpha={0.1}
               speed={0.1}
-              initialColors={{
-                star1: "#049ef4",
-                star2: "#e91e63",
-              }}
+              initialColors={PIXI_THREE_STAR}
             />
             <ThreeScene>
-              <SpinnyCube position={[-2, -2, 0]} />
-              <SpinnyCube position={[0, -2, 0]} />
-              <SpinnyCube position={[2, -2, 0]} />
-              <SpinnyCube position={[-2, 0, 0]} />
-              <SpinnyCube position={[0, 0, 0]} />
-              <SpinnyCube position={[2, 0, 0]} />
-              <SpinnyCube position={[-2, 2, 0]} />
-              <SpinnyCube position={[0, 2, 0]} />
-              <SpinnyCube position={[2, 2, 0]} />
+              <SpinnyCubeWithStars position={[-2, -2, 0]} />
+              <SpinnyCubeWithStars position={[0, -2, 0]} />
+              <SpinnyCubeWithStars position={[2, -2, 0]} />
+              <SpinnyCubeWithStars position={[-2, 0, 0]} />
+              <SpinnyCubeWithStars position={[0, 0, 0]} />
+              <SpinnyCubeWithStars position={[2, 0, 0]} />
+              <SpinnyCubeWithStars position={[-2, 2, 0]} />
+              <SpinnyCubeWithStars position={[0, 2, 0]} />
+              <SpinnyCubeWithStars position={[2, 2, 0]} />
             </ThreeScene>
           </FadeIn>
         </CanvasView>

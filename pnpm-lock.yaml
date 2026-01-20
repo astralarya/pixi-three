@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      three-mesh-bvh:
+        specifier: ^0.9.7
+        version: 0.9.7(three@0.182.0)
     devDependencies:
       '@base-ui/react':
         specifier: ^1.0.0
@@ -2198,6 +2202,11 @@ packages:
   tapable@2.3.0:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
+
+  three-mesh-bvh@0.9.7:
+    resolution: {integrity: sha512-EYSJbykeAjhVxwZjuUYq/kelIbqBoV9sbAgvZ+j1xCgZyNYSkr51WDJWS4WIfK2OX6YcjBGoTicX4RoOVQzx0g==}
+    peerDependencies:
+      three: '>= 0.159.0'
 
   three@0.182.0:
     resolution: {integrity: sha512-GbHabT+Irv+ihI1/f5kIIsZ+Ef9Sl5A1Y7imvS5RQjWgtTPfPnZ43JmlYI7NtCRDK9zir20lQpfg8/9Yd02OvQ==}
@@ -4528,6 +4537,10 @@ snapshots:
   tailwindcss@4.1.18: {}
 
   tapable@2.3.0: {}
+
+  three-mesh-bvh@0.9.7(three@0.182.0):
+    dependencies:
+      three: 0.182.0
 
   three@0.182.0: {}
 

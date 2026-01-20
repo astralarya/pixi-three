@@ -2,6 +2,16 @@ import { useViewport } from "@astralarium/pixi-three";
 import { extend, useTick } from "@pixi/react";
 import { type ColorSource, Container, Graphics, Point } from "pixi.js";
 import { type ComponentProps, useRef, useState } from "react";
+import { Vector2 } from "three";
+
+import { pixiRed, threeBlue } from "#components/lib/colors";
+
+export const PIXI_THREE_STAR = {
+  star1: threeBlue[500],
+  star1Hover: threeBlue[300],
+  star2: pixiRed[600],
+  star2Hover: pixiRed[400],
+} as const;
 
 extend({ Container, Graphics });
 
@@ -20,14 +30,21 @@ export interface SpinnyStarColors {
   star2Hover?: ColorSource;
 }
 
+export interface StarTipData {
+  uv: Vector2;
+  color: ColorSource;
+}
+
 export interface SpinnyStarProps {
   speed?: number;
   initialColors?: SpinnyStarColors;
+  onStarTipsUpdate?: (tips: StarTipData[]) => void;
 }
 
 export function SpinnyStar({
   speed = 1,
   initialColors,
+  onStarTipsUpdate,
   ...props
 }: SpinnyStarProps & ComponentProps<"pixiContainer">) {
   const size = useViewport();
@@ -63,6 +80,32 @@ export function SpinnyStar({
     time2.current += ticker.deltaMS * (hover2 ? 0.2 : 1) * speed;
     star1.current.rotation = ((time1.current % 4000) / 4000) * 2 * Math.PI;
     star2.current.scale = Math.sin((time2.current / 1000 / 2) * Math.PI) + 1.5;
+
+    if (onStarTipsUpdate) {
+      const tips: StarTipData[] = [];
+
+      for (let i = 0; i < 5; i++) {
+        const baseAngle = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
+
+        const star1Angle = baseAngle + star1.current.rotation;
+        const star1X = center.x + Math.cos(star1Angle) * radius;
+        const star1Y = center.y + Math.sin(star1Angle) * radius;
+        tips.push({
+          uv: new Vector2(star1X / size.width, star1Y / size.height),
+          color: star1_color,
+        });
+
+        const currentRadius = radius * star2.current.scale.x;
+        const star2X = center.x + Math.cos(baseAngle) * currentRadius;
+        const star2Y = center.y + Math.sin(baseAngle) * currentRadius;
+        tips.push({
+          uv: new Vector2(star2X / size.width, star2Y / size.height),
+          color: star2_color,
+        });
+      }
+
+      onStarTipsUpdate(tips);
+    }
   });
 
   function drawStar1(graphics: Graphics) {

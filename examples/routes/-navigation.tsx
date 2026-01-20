@@ -49,6 +49,11 @@ const EXAMPLE_LINKS = [
     ),
   },
   {
+    label: "Bijections",
+    to: "/example/bijections",
+    description: "Coordinate system mapping",
+  },
+  {
     label: "On-Demand Rendering",
     to: "/example/demand-rendering",
     description: "Save power on mobile devices",

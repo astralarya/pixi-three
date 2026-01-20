@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExampleVideoPreviewRouteImport } from './routes/example/video-preview'
 import { Route as ExampleUnmountContextRouteImport } from './routes/example/unmount-context'
 import { Route as ExampleDemandRenderingRouteImport } from './routes/example/demand-rendering'
+import { Route as ExampleBijectionsRouteImport } from './routes/example/bijections'
 import { Route as ExampleBasicSceneRouteImport } from './routes/example/basic-scene'
 
 const ExampleRoute = ExampleRouteImport.update({
@@ -47,6 +48,11 @@ const ExampleDemandRenderingRoute = ExampleDemandRenderingRouteImport.update({
   path: '/demand-rendering',
   getParentRoute: () => ExampleRoute,
 } as any)
+const ExampleBijectionsRoute = ExampleBijectionsRouteImport.update({
+  id: '/bijections',
+  path: '/bijections',
+  getParentRoute: () => ExampleRoute,
+} as any)
 const ExampleBasicSceneRoute = ExampleBasicSceneRouteImport.update({
   id: '/basic-scene',
   path: '/basic-scene',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/docs': typeof DocsRoute
   '/example': typeof ExampleRouteWithChildren
   '/example/basic-scene': typeof ExampleBasicSceneRoute
+  '/example/bijections': typeof ExampleBijectionsRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
   '/example/unmount-context': typeof ExampleUnmountContextRoute
   '/example/video-preview': typeof ExampleVideoPreviewRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/docs': typeof DocsRoute
   '/example': typeof ExampleRouteWithChildren
   '/example/basic-scene': typeof ExampleBasicSceneRoute
+  '/example/bijections': typeof ExampleBijectionsRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
   '/example/unmount-context': typeof ExampleUnmountContextRoute
   '/example/video-preview': typeof ExampleVideoPreviewRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/docs': typeof DocsRoute
   '/example': typeof ExampleRouteWithChildren
   '/example/basic-scene': typeof ExampleBasicSceneRoute
+  '/example/bijections': typeof ExampleBijectionsRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
   '/example/unmount-context': typeof ExampleUnmountContextRoute
   '/example/video-preview': typeof ExampleVideoPreviewRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/example'
     | '/example/basic-scene'
+    | '/example/bijections'
     | '/example/demand-rendering'
     | '/example/unmount-context'
     | '/example/video-preview'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/example'
     | '/example/basic-scene'
+    | '/example/bijections'
     | '/example/demand-rendering'
     | '/example/unmount-context'
     | '/example/video-preview'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/example'
     | '/example/basic-scene'
+    | '/example/bijections'
     | '/example/demand-rendering'
     | '/example/unmount-context'
     | '/example/video-preview'
@@ -161,6 +173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExampleDemandRenderingRouteImport
       parentRoute: typeof ExampleRoute
     }
+    '/example/bijections': {
+      id: '/example/bijections'
+      path: '/bijections'
+      fullPath: '/example/bijections'
+      preLoaderRoute: typeof ExampleBijectionsRouteImport
+      parentRoute: typeof ExampleRoute
+    }
     '/example/basic-scene': {
       id: '/example/basic-scene'
       path: '/basic-scene'
@@ -173,6 +192,7 @@ declare module '@tanstack/react-router' {
 
 interface ExampleRouteChildren {
   ExampleBasicSceneRoute: typeof ExampleBasicSceneRoute
+  ExampleBijectionsRoute: typeof ExampleBijectionsRoute
   ExampleDemandRenderingRoute: typeof ExampleDemandRenderingRoute
   ExampleUnmountContextRoute: typeof ExampleUnmountContextRoute
   ExampleVideoPreviewRoute: typeof ExampleVideoPreviewRoute
@@ -180,6 +200,7 @@ interface ExampleRouteChildren {
 
 const ExampleRouteChildren: ExampleRouteChildren = {
   ExampleBasicSceneRoute: ExampleBasicSceneRoute,
+  ExampleBijectionsRoute: ExampleBijectionsRoute,
   ExampleDemandRenderingRoute: ExampleDemandRenderingRoute,
   ExampleUnmountContextRoute: ExampleUnmountContextRoute,
   ExampleVideoPreviewRoute: ExampleVideoPreviewRoute,

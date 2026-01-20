@@ -3,7 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { PropsWithChildren } from "react";
 
 import { FadeIn } from "#components/fade-in";
-import { SpinnyCube } from "#components/spinny-cube";
+import { SpinnyCubeWithStars } from "#components/spinny-cube-with-stars";
+import { PIXI_THREE_STAR } from "#components/spinny-star";
 import { Button } from "#components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -50,15 +51,10 @@ function LandingPageClient() {
         <CanvasView alpha>
           <FadeIn>
             <ThreeScene>
-              <SpinnyCube
+              <SpinnyCubeWithStars
                 size={2.5}
                 speed={0.25}
-                initialColors={{
-                  star1: "#049ef4",
-                  star1Hover: "#77ceff",
-                  star2: "#e91e63",
-                  star2Hover: "#fe68a6",
-                }}
+                initialColors={PIXI_THREE_STAR}
               />
             </ThreeScene>
           </FadeIn>
