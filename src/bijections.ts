@@ -204,37 +204,59 @@ export function disposeUvBvh(geometry: BufferGeometry): void {
 }
 
 export interface UvToThreeResult {
-  position: Vector3 | null;
+  position: Vector3;
   normal: Vector3;
   faceIndex: number;
-  /** Barycentric coordinates within the triangle (null if position is null) */
-  barycentric: Vector3 | null;
+  /** Barycentric coordinates within the triangle */
+  barycentric: Vector3;
+  /** Whether the UV point is contained within the triangle */
+  isContained: boolean;
 }
 
 const _queryPoint = new Vector3();
 const _uvPoint = new Vector3();
 
 /**
+ * Filter function for UV to Three mapping results.
+ * Return true to include the result, false to exclude it from the list.
+ */
+export type UvToThreeFilter = (args: {
+  tri: Triangle;
+  faceIndex: number;
+  uv: Vector2;
+  mesh: Mesh;
+  result: UvToThreeResult;
+}) => boolean;
+
+/**
+ * Default filter that only includes results where the UV point is contained within the triangle.
+ */
+export const defaultUvToThreeFilter: UvToThreeFilter = ({ result }) =>
+  result.isContained;
+
+/**
  * Maps UV coordinates on a mesh's surface to 3D local positions.
  *
  * @param uv - UV coordinates (0-1) on the mesh's surface
  * @param mesh - The Mesh whose surface we're mapping from
- * @param hint - Optional hint to filter/prioritize results
- * @param hint.faceIndex - If provided, only check this specific triangle
- * @param hint.normal - If provided, filter to faces with similar normals (in local space)
- * @param hint.normalThreshold - Dot product threshold for normal filtering (default 0.9)
+ * @param options - Optional options
+ * @param options.faceIndex - If provided, only check this specific triangle
+ * @param options.filter - Custom filter function to mark results as filtered. Defaults to isContained.
  * @returns Array of matching results with position, normal, and faceIndex (all in local space)
  */
 export function mapUvToThreeLocal(
   uv: Vector2,
   mesh: Mesh,
-  hint?: { faceIndex?: number; normal?: Vector3; normalThreshold?: number },
+  options?: { faceIndex?: number; filter?: UvToThreeFilter },
 ): UvToThreeResult[] {
-  const { faceIndex, normal, normalThreshold = 0.9 } = hint ?? {};
+  const { faceIndex, filter = defaultUvToThreeFilter } = options ?? {};
   const results: UvToThreeResult[] = [];
 
   if (faceIndex !== undefined) {
-    results.push(checkTriangle(faceIndex, uv, mesh.geometry));
+    const result = checkTriangle(faceIndex, uv, mesh.geometry);
+    if (filter({ tri: _uvTri, faceIndex, uv, mesh, result })) {
+      results.push(result);
+    }
     return results;
   }
 
@@ -244,18 +266,10 @@ export function mapUvToThreeLocal(
   bvh.shapecast({
     intersectsBounds: (box) => box.containsPoint(_queryPoint),
     intersectsTriangle: (tri, triFaceIndex) => {
-      _uvPoint.set(uv.x, uv.y, 0);
-      if (!tri.containsPoint(_uvPoint)) {
-        return false;
-      }
-
       const result = checkTriangle(triFaceIndex, uv, mesh.geometry);
-      if (normal) {
-        if (result.normal.dot(normal) < normalThreshold) {
-          result.position = null;
-        }
+      if (filter({ tri, faceIndex: triFaceIndex, uv, mesh, result })) {
+        results.push(result);
       }
-      results.push(result);
       return false;
     },
   });
@@ -268,37 +282,35 @@ export function mapUvToThreeLocal(
  *
  * @param uv - UV coordinates (0-1) on the mesh's surface
  * @param mesh - The Mesh whose surface we're mapping from
- * @param hint - Optional hint to filter/prioritize results
- * @param hint.faceIndex - If provided, only check this specific triangle
- * @param hint.normal - If provided, filter to faces with similar normals (in world space)
- * @param hint.normalThreshold - Dot product threshold for normal filtering (default 0.9)
+ * @param options - Optional options
+ * @param options.faceIndex - If provided, only check this specific triangle
+ * @param options.filter - Custom filter function to mark results as filtered
  * @returns Array of matching results with position, normal, and faceIndex (all in world space)
  */
 export function mapUvToThree(
   uv: Vector2,
   mesh: Mesh,
-  hint?: { faceIndex?: number; normal?: Vector3; normalThreshold?: number },
+  options?: { faceIndex?: number; filter?: UvToThreeFilter },
 ): UvToThreeResult[] {
-  const localResults = mapUvToThreeLocal(uv, mesh, hint);
+  const localResults = mapUvToThreeLocal(uv, mesh, options);
 
-  return localResults.map(({ position, normal, faceIndex, barycentric }) => {
-    if (position === null) {
-      return { position: null, normal, faceIndex, barycentric: null };
-    }
+  return localResults.map(
+    ({ position, normal, faceIndex, barycentric, isContained }) => {
+      const worldPosition = position.clone();
+      mesh.localToWorld(worldPosition);
 
-    const worldPosition = position.clone();
-    mesh.localToWorld(worldPosition);
+      const worldNormal = normal.clone();
+      worldNormal.transformDirection(mesh.matrixWorld);
 
-    const worldNormal = normal.clone();
-    worldNormal.transformDirection(mesh.matrixWorld);
-
-    return {
-      position: worldPosition,
-      normal: worldNormal,
-      faceIndex,
-      barycentric,
-    };
-  });
+      return {
+        position: worldPosition,
+        normal: worldNormal,
+        faceIndex,
+        barycentric,
+        isContained,
+      };
+    },
+  );
 }
 
 const _uvTri = new Triangle();
@@ -335,24 +347,25 @@ function checkTriangle(
   _uvTri.c.set(uvAttr.getX(i2), uvAttr.getY(i2), 0);
 
   _uvPoint.set(uv.x, uv.y, 0);
-  if (!_uvTri.containsPoint(_uvPoint)) {
-    return { position: null, normal, faceIndex, barycentric: null };
-  }
-  const bary = _uvTri.getBarycoord(_uvPoint, _bary);
-  if (!bary) {
-    return { position: null, normal, faceIndex, barycentric: null };
-  }
+  const isContained = _uvTri.containsPoint(_uvPoint);
+  _uvTri.getBarycoord(_uvPoint, _bary);
 
-  Triangle.getInterpolatedAttribute(posAttr, i0, i1, i2, bary, _position);
+  Triangle.getInterpolatedAttribute(posAttr, i0, i1, i2, _bary, _position);
   const position = _position.clone();
-  const barycentric = bary.clone();
+  const barycentric = _bary.clone();
 
   if (normAttr) {
-    Triangle.getInterpolatedAttribute(normAttr, i0, i1, i2, bary, _normal);
+    Triangle.getInterpolatedAttribute(normAttr, i0, i1, i2, _bary, _normal);
     normal.copy(_normal);
   }
 
-  return { position, normal, faceIndex, barycentric };
+  return {
+    position,
+    normal,
+    faceIndex,
+    barycentric,
+    isContained,
+  };
 }
 
 const _ndc = new Vector3();

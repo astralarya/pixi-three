@@ -93,7 +93,6 @@ export function SpinnyCubeWithFollowers({
 
       for (const result of results) {
         if (instanceIndex >= MAX_INSTANCES) break;
-        if (result.position === null) continue;
 
         const faceKey = getNormalFaceKey(result.normal);
         const shadeOffset = FACE_SHADE_OFFSETS[faceKey] ?? 0;
