@@ -12,6 +12,8 @@ import {
   navigationMenuTriggerStyle,
 } from "#components/ui/navigation-menu";
 
+import { EXAMPLES } from "./example/-examples";
+
 type NavLink = {
   label: string;
   description?: ReactNode;
@@ -35,40 +37,6 @@ const NAV_LINKS = {
     href: "https://github.com/astralarium/pixi-three",
   },
 } as const satisfies Record<string, NavLink>;
-
-const EXAMPLE_LINKS = [
-  {
-    label: "Basic Scene",
-    to: "/example/basic-scene",
-    description: (
-      <>
-        <span className="text-pixi-red font-bold">Pixi</span>
-        {" + "}
-        <span className="text-three-blue font-bold">Three</span> integration.
-      </>
-    ),
-  },
-  {
-    label: "Bijections",
-    to: "/example/bijections",
-    description: "Coordinate system mapping",
-  },
-  {
-    label: "On-Demand Rendering",
-    to: "/example/demand-rendering",
-    description: "Save power on mobile devices",
-  },
-  {
-    label: "Unmount Context",
-    to: "/example/unmount-context",
-    description: "Unmount the <RenderContext>",
-  },
-  {
-    label: "Video Preview",
-    to: "/example/video-preview",
-    description: "Preview transparent video",
-  },
-] as const satisfies readonly NavLink[];
 
 export function Navigation() {
   return (
@@ -94,7 +62,7 @@ export function Navigation() {
           <NavigationMenuTrigger>Examples</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-100 gap-3 p-4 md:w-125 md:grid-cols-2">
-              {EXAMPLE_LINKS.map((example) => (
+              {EXAMPLES.map((example) => (
                 <li key={example.to}>
                   <NavigationMenuLink
                     closeOnClick
@@ -158,7 +126,7 @@ export function Navigation() {
               <li className="text-muted-foreground px-3 py-1 text-xs font-semibold">
                 Examples
               </li>
-              {EXAMPLE_LINKS.map((example) => (
+              {EXAMPLES.map((example) => (
                 <li key={example.to}>
                   <NavigationMenuLink
                     closeOnClick

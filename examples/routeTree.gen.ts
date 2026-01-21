@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ExampleRouteImport } from './routes/example'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExampleIndexRouteImport } from './routes/example/index'
 import { Route as ExampleVideoPreviewRouteImport } from './routes/example/video-preview'
 import { Route as ExampleUnmountContextRouteImport } from './routes/example/unmount-context'
 import { Route as ExampleDemandRenderingRouteImport } from './routes/example/demand-rendering'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ExampleIndexRoute = ExampleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ExampleRoute,
 } as any)
 const ExampleVideoPreviewRoute = ExampleVideoPreviewRouteImport.update({
   id: '/video-preview',
@@ -68,16 +74,17 @@ export interface FileRoutesByFullPath {
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
   '/example/unmount-context': typeof ExampleUnmountContextRoute
   '/example/video-preview': typeof ExampleVideoPreviewRoute
+  '/example/': typeof ExampleIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/docs': typeof DocsRoute
-  '/example': typeof ExampleRouteWithChildren
   '/example/basic-scene': typeof ExampleBasicSceneRoute
   '/example/bijections': typeof ExampleBijectionsRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
   '/example/unmount-context': typeof ExampleUnmountContextRoute
   '/example/video-preview': typeof ExampleVideoPreviewRoute
+  '/example': typeof ExampleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +96,7 @@ export interface FileRoutesById {
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
   '/example/unmount-context': typeof ExampleUnmountContextRoute
   '/example/video-preview': typeof ExampleVideoPreviewRoute
+  '/example/': typeof ExampleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,16 +109,17 @@ export interface FileRouteTypes {
     | '/example/demand-rendering'
     | '/example/unmount-context'
     | '/example/video-preview'
+    | '/example/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/docs'
-    | '/example'
     | '/example/basic-scene'
     | '/example/bijections'
     | '/example/demand-rendering'
     | '/example/unmount-context'
     | '/example/video-preview'
+    | '/example'
   id:
     | '__root__'
     | '/'
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/example/demand-rendering'
     | '/example/unmount-context'
     | '/example/video-preview'
+    | '/example/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -151,6 +161,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/example/': {
+      id: '/example/'
+      path: '/'
+      fullPath: '/example/'
+      preLoaderRoute: typeof ExampleIndexRouteImport
+      parentRoute: typeof ExampleRoute
     }
     '/example/video-preview': {
       id: '/example/video-preview'
@@ -196,6 +213,7 @@ interface ExampleRouteChildren {
   ExampleDemandRenderingRoute: typeof ExampleDemandRenderingRoute
   ExampleUnmountContextRoute: typeof ExampleUnmountContextRoute
   ExampleVideoPreviewRoute: typeof ExampleVideoPreviewRoute
+  ExampleIndexRoute: typeof ExampleIndexRoute
 }
 
 const ExampleRouteChildren: ExampleRouteChildren = {
@@ -204,6 +222,7 @@ const ExampleRouteChildren: ExampleRouteChildren = {
   ExampleDemandRenderingRoute: ExampleDemandRenderingRoute,
   ExampleUnmountContextRoute: ExampleUnmountContextRoute,
   ExampleVideoPreviewRoute: ExampleVideoPreviewRoute,
+  ExampleIndexRoute: ExampleIndexRoute,
 }
 
 const ExampleRouteWithChildren =

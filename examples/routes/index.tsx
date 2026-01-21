@@ -32,11 +32,7 @@ function LandingPage({ children }: PropsWithChildren) {
         <Button size="lg" render={<a href="/pixi-three/docs/" />}>
           Docs
         </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          render={<Link to="/example/basic-scene" />}
-        >
+        <Button size="lg" variant="outline" render={<Link to="/example" />}>
           Examples
         </Button>
       </div>
