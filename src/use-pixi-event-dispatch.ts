@@ -10,11 +10,13 @@ import { type RefObject, useState } from "react";
 import { type PixiRootEvents } from "./pixi-synthetic-event-system";
 import { useRenderContext } from "./render-context-hooks";
 
+/** @internal */
 export interface UsePixiEventDispatchOptions {
   containerRef: RefObject<Container>;
   canvasRef: RefObject<HTMLCanvasElement | HTMLElement>;
 }
 
+/** @internal */
 export type UsePixiEventDispatchResult = (
   event: Event,
   point: Point | null,
@@ -25,6 +27,7 @@ export type UsePixiEventDispatchResult = (
  * Creates and manages the EventBoundary and root federated events,
  * and provides a dispatchEvent function for forwarding events to Pixi containers.
  *
+ * @internal
  * @param options - The container and canvas refs
  * @returns The dispatch function
  */

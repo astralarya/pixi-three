@@ -25,6 +25,7 @@ import { MeshBVH } from "three-mesh-bvh";
 /**
  * Maps UV coordinates (0-1) to Pixi pixel coordinates.
  *
+ * @category bijection
  * @param uv - Three.js UV Vector2 (0-1 range)
  * @param point - The Pixi Point to store the result
  * @param bounds - The bounds to map within (width/height and optional x/y offset)
@@ -46,6 +47,7 @@ export function mapUvToPixi(
 /**
  * Maps Pixi pixel coordinates to UV coordinates (0-1).
  *
+ * @category bijection
  * @param point - The Pixi Point in local coordinates
  * @param uv - Three.js UV Vector2 to store the result
  * @param bounds - The bounds to map within
@@ -67,6 +69,7 @@ export function mapPixiToUv(
 /**
  * Maps a Pixi Point to Three.js NDC coordinates (-1 to 1).
  *
+ * @category bijection
  * @param point - The Pixi Point in local coordinates
  * @param ndc - Vector2 to store the NDC result
  * @param bounds - The bounds to normalize within
@@ -90,6 +93,7 @@ export function mapPixiToNdc(
 /**
  * Maps Three.js NDC coordinates (-1 to 1) to a Pixi Point.
  *
+ * @category bijection
  * @param ndc - Vector2 with NDC coordinates (-1 to 1)
  * @param point - The Pixi Point to store the result
  * @param bounds - The bounds to map within
@@ -113,6 +117,7 @@ export function mapNdcToPixi(
 /**
  * Maps UV coordinates (0-1) to Three.js NDC coordinates (-1 to 1).
  *
+ * @category bijection
  * @param uv - Vector2 with UV coordinates (0-1)
  * @param ndc - Vector2 to store the NDC result
  */
@@ -124,6 +129,7 @@ export function mapUvToNdc(uv: Vector2, ndc: Vector2): void {
 /**
  * Maps Three.js NDC coordinates (-1 to 1) to UV coordinates (0-1).
  *
+ * @category bijection
  * @param ndc - Vector2 with NDC coordinates (-1 to 1)
  * @param uv - Vector2 to store the UV result
  */
@@ -135,6 +141,7 @@ export function mapNdcToUv(ndc: Vector2, uv: Vector2): void {
 /**
  * Maps DOM client coordinates directly to Pixi pixel coordinates within a viewport.
  *
+ * @category bijection
  * @param clientX - DOM clientX coordinate
  * @param clientY - DOM clientY coordinate
  * @param rect - The element's bounding rect
@@ -165,6 +172,7 @@ declare module "three" {
  * Gets or creates a Bounding Volume Hierarchy (BVH) for UV-space lookups on the given geometry.
  * The BVH treats UV coordinates as 2D positions (z=0).
  *
+ * @category bijection
  * @param geometry - The BufferGeometry for the UV BVH
  * @returns The UV-space MeshBVH
  */
@@ -205,6 +213,7 @@ export function getOrCreateUvBvh(geometry: BufferGeometry): MeshBVH {
 /**
  * Clears the cached UV BVH from a geometry. Call this if UV coordinates change.
  *
+ * @category bijection
  * @param geometry - The BufferGeometry to clear the UV BVH from
  */
 export function disposeUvBvh(geometry: BufferGeometry): void {
@@ -214,6 +223,10 @@ export function disposeUvBvh(geometry: BufferGeometry): void {
   }
 }
 
+/**
+ * Result of UV to Three.js coordinate mapping.
+ * @category bijection
+ */
 export interface UvToThreeResult {
   position: Vector3;
   normal: Vector3;
@@ -230,6 +243,8 @@ const _uvPoint = new Vector3();
 /**
  * Filter function for UV to Three mapping results.
  * Return true to include the result, false to exclude it from the list.
+ *
+ * @category bijection
  */
 export type UvToThreeFilter = (args: {
   tri: Triangle;
@@ -241,6 +256,8 @@ export type UvToThreeFilter = (args: {
 
 /**
  * Default filter that only includes results where the UV point is contained within the triangle.
+ *
+ * @category bijection
  */
 export const defaultUvToThreeFilter: UvToThreeFilter = ({ result }) =>
   result.isContained;
@@ -248,6 +265,7 @@ export const defaultUvToThreeFilter: UvToThreeFilter = ({ result }) =>
 /**
  * Maps UV coordinates on a mesh's surface to 3D local positions.
  *
+ * @category bijection
  * @param uv - UV coordinates (0-1) on the mesh's surface
  * @param mesh - The Mesh whose surface we're mapping from
  * @param options - Optional options
@@ -291,6 +309,7 @@ export function mapUvToThreeLocal(
 /**
  * Maps UV coordinates on a mesh's surface to 3D world positions.
  *
+ * @category bijection
  * @param uv - UV coordinates (0-1) on the mesh's surface
  * @param mesh - The Mesh whose surface we're mapping from
  * @param options - Optional options
@@ -384,6 +403,7 @@ const _ndc = new Vector3();
 /**
  * Maps a 3D world position to NDC coordinates in the camera's view.
  *
+ * @category bijection
  * @param vec3 - The world position
  * @param ndc - Vector2 to store the NDC result (-1 to 1)
  * @param camera - The camera to project through
