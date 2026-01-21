@@ -30,13 +30,20 @@ import {
   useRef,
   useState,
 } from "react";
-import { Raycaster, type RenderTargetOptions, Scene, Vector2 } from "three";
+import {
+  Raycaster,
+  type RenderTargetOptions,
+  Scene,
+  Vector2,
+  type Vector3,
+} from "three";
 import { type PostProcessing } from "three/webgpu";
 import tunnel from "tunnel-rat";
 
 import {
   mapNdcToPixi as mapNdcToPixiUtil,
   mapPixiToNdc as mapPixiToNdcUtil,
+  mapThreeToNdc,
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
@@ -47,7 +54,10 @@ import {
 } from "./pixi-texture-context";
 import { useRenderContext } from "./render-context-hooks";
 import { Portal } from "./three-portal";
-import { ThreeSceneContext } from "./three-scene-context";
+import {
+  ThreeSceneContext,
+  useThreeSceneContextOptional,
+} from "./three-scene-context";
 import { useBridge } from "./use-bridge";
 import { useRenderSchedule } from "./use-render-schedule";
 
@@ -187,6 +197,7 @@ function ThreeSceneSprite(props: ThreeSceneSpriteProps) {
   const { app } = useApplication();
   const { threeSceneTunnel } = useRenderContext();
   const pixiTextureContext = usePixiTextureContextOptional();
+  const parentThreeSceneContext = useThreeSceneContextOptional();
 
   const key = useId();
 
@@ -200,10 +211,10 @@ function ThreeSceneSprite(props: ThreeSceneSpriteProps) {
       />
     </Bridge>
   );
-  return pixiTextureContext ? (
-    <pixiTextureContext.sceneTunnel.In>
+  return parentThreeSceneContext ? (
+    <parentThreeSceneContext.sceneTunnel.In>
       {sprite}
-    </pixiTextureContext.sceneTunnel.In>
+    </parentThreeSceneContext.sceneTunnel.In>
   ) : (
     <threeSceneTunnel.In>{sprite}</threeSceneTunnel.In>
   );
@@ -365,46 +376,112 @@ function ThreeSceneSpriteInternal({
   return (
     <>
       <CanvasTreeContext value={{ store, invalidate }}>
-        <ThreeSceneContext
-          value={{
-            containerRef,
-            sceneTunnel,
-            mapPixiToNdc,
-            mapNdcToPixi,
-          }}
-        >
-          {createPortal(
-            <Portal
-              renderPriority={renderPriority}
-              width={width}
-              height={height}
-              resolution={resolution}
-              renderTargetOptions={renderTargetOptions}
-              onTextureUpdate={onTextureUpdate}
-              postProcessing={postProcessing}
-              frameloop={frameloop}
-              isFrameRequested={isFrameRequested}
-              signalFrame={signalFrame}
+        {createPortal(
+          <Portal
+            renderPriority={renderPriority}
+            width={width}
+            height={height}
+            resolution={resolution}
+            renderTargetOptions={renderTargetOptions}
+            onTextureUpdate={onTextureUpdate}
+            postProcessing={postProcessing}
+            frameloop={frameloop}
+            isFrameRequested={isFrameRequested}
+            signalFrame={signalFrame}
+          >
+            <ThreeSceneContextProvider
+              containerRef={containerRef}
+              sceneTunnel={sceneTunnel}
+              mapPixiToNdc={mapPixiToNdc}
+              mapNdcToPixi={mapNdcToPixi}
+              sprite={sprite}
+              pixiTextureContext={pixiTextureContext}
             >
               <HitAreaSetup setHitArea={setHitArea} />
               {children}
               <sceneTunnel.Out />
-              {/* Without an element that receives pointer events state.pointer will always be 0/0 */}
-              <group onPointerOver={() => null} />
-            </Portal>,
-            scene,
-            {
-              events: {
-                compute: eventCompute ?? computeFn,
-                priority: eventPriority,
-                connected: canvasRef.current,
-              },
-              size: { top: 0, left: 0, width, height },
+            </ThreeSceneContextProvider>
+            {/* Without an element that receives pointer events state.pointer will always be 0/0 */}
+            <group onPointerOver={() => null} />
+          </Portal>,
+          scene,
+          {
+            events: {
+              compute: eventCompute ?? computeFn,
+              priority: eventPriority,
+              connected: canvasRef.current,
             },
-          )}
-        </ThreeSceneContext>
+            size: { top: 0, left: 0, width, height },
+          },
+        )}
       </CanvasTreeContext>
     </>
+  );
+}
+
+interface ThreeSceneContextProviderProps {
+  containerRef: RefObject<Container>;
+  sceneTunnel: ReturnType<typeof tunnel>;
+  mapPixiToNdc: (point: Point, ndc: Vector2) => void;
+  mapNdcToPixi: (ndc: Vector2, point: Point) => void;
+  sprite: RefObject<Sprite>;
+  pixiTextureContext: PixiTextureContextValue | null;
+  children: ReactNode;
+}
+
+function ThreeSceneContextProvider({
+  containerRef,
+  sceneTunnel,
+  mapPixiToNdc,
+  mapNdcToPixi,
+  sprite,
+  pixiTextureContext,
+  children,
+}: ThreeSceneContextProviderProps) {
+  const { camera } = useThree();
+
+  const _ndc = new Vector2();
+  const _localPos = new Point();
+
+  function mapThreeToParentPixiLocal(vec3: Vector3, point: Point) {
+    // Project world vec3 through camera to NDC
+    mapThreeToNdc(vec3, _ndc, camera);
+
+    // Map NDC to local sprite coords
+    mapNdcToPixi(_ndc, point);
+  }
+
+  function mapThreeToParentPixi(vec3: Vector3, point: Point) {
+    mapThreeToParentPixiLocal(vec3, _localPos);
+
+    // Transform to global Pixi coords
+    sprite.current.toGlobal(_localPos, point);
+  }
+
+  function mapThreeToViewport(vec3: Vector3, point: Point) {
+    mapThreeToParentPixi(vec3, point);
+
+    // If inside PixiTexture, delegate to parent's mapPixiToViewport
+    if (pixiTextureContext) {
+      pixiTextureContext.mapPixiToViewport(point, point);
+    }
+    // Otherwise we're at CanvasView level - point is already in viewport coords
+  }
+
+  return (
+    <ThreeSceneContext
+      value={{
+        containerRef,
+        sceneTunnel,
+        mapPixiToNdc,
+        mapNdcToPixi,
+        mapThreeToParentPixiLocal,
+        mapThreeToParentPixi,
+        mapThreeToViewport,
+      }}
+    >
+      {children}
+    </ThreeSceneContext>
   );
 }
 

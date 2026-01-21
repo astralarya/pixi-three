@@ -4,8 +4,9 @@ import {
   createPortal,
   type DomEvent,
   type RootState,
+  useThree,
 } from "@react-three/fiber";
-import { type Point } from "pixi.js";
+import { Point } from "pixi.js";
 import {
   type ReactNode,
   type Ref,
@@ -15,19 +16,25 @@ import {
   useState,
 } from "react";
 import {
-  type Object3D,
+  Mesh,
+  Object3D,
   type RenderTarget,
   type RenderTargetOptions,
   Scene,
   type Texture,
   Vector2,
+  Vector3,
 } from "three";
 import tunnel from "tunnel-rat";
 
 import {
   mapNdcToPixi as mapNdcToPixiUtil,
+  mapNdcToUv,
   mapPixiToNdc as mapPixiToNdcUtil,
+  mapThreeToNdc,
   mapUvToNdc,
+  mapUvToThree,
+  mapUvToThreeLocal,
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
@@ -134,8 +141,10 @@ export function ThreeRenderTexture({
     store.notifySubscribers();
   }, [store, width, height, resolution]);
 
-  const { containerRef } = useThreeSceneContext();
+  const parentThreeSceneContext = useThreeSceneContext();
+  const { containerRef } = parentThreeSceneContext;
   const [texture, setTexture] = useState<Texture | null>(null);
+  const { camera } = useThree();
 
   const getAttachedObject = useAttachedObject(objectRef);
 
@@ -149,6 +158,75 @@ export function ThreeRenderTexture({
 
   function mapNdcToPixi(ndc: Vector2, point: Point) {
     mapNdcToPixiUtil(ndc, point, bounds);
+  }
+
+  const _ndc = new Vector2();
+  const _uv = new Vector2();
+  const _threeParent = new Vector3();
+
+  function mapThreeToParentUv(vec3: Vector3, uv: Vector2) {
+    // Project world vec3 through camera to NDC
+    mapThreeToNdc(vec3, _ndc, camera);
+
+    // Map NDC to UV
+    mapNdcToUv(_ndc, uv);
+  }
+
+  function mapThreeToParentThreeLocal(vec3: Vector3, out: Vector3) {
+    mapThreeToParentUv(vec3, _uv);
+
+    // Get attached mesh and convert UV to local position on mesh surface
+    const object = getAttachedObject();
+    if (!object || !(object instanceof Mesh)) {
+      // Fallback: can't map without mesh
+      out.copy(vec3);
+      return;
+    }
+
+    const results = mapUvToThreeLocal(_uv, object);
+    if (results.length === 0) {
+      // UV not on mesh surface, fallback
+      out.copy(vec3);
+      return;
+    }
+
+    out.copy(results[0].position);
+  }
+
+  function mapThreeToParentThree(vec3: Vector3, out: Vector3) {
+    mapThreeToParentUv(vec3, _uv);
+
+    // Get attached mesh and convert UV to world position
+    const object = getAttachedObject();
+    if (!object || !(object instanceof Mesh)) {
+      // Fallback: can't map without mesh
+      out.copy(vec3);
+      return;
+    }
+
+    const results = mapUvToThree(_uv, object);
+    if (results.length === 0) {
+      // UV not on mesh surface, fallback
+      out.copy(vec3);
+      return;
+    }
+
+    out.copy(results[0].position);
+  }
+
+  function mapThreeToParentPixiLocal(vec3: Vector3, point: Point) {
+    mapThreeToParentThree(vec3, _threeParent);
+    parentThreeSceneContext.mapThreeToParentPixiLocal(_threeParent, point);
+  }
+
+  function mapThreeToParentPixi(vec3: Vector3, point: Point) {
+    mapThreeToParentThree(vec3, _threeParent);
+    parentThreeSceneContext.mapThreeToParentPixi(_threeParent, point);
+  }
+
+  function mapThreeToViewport(vec3: Vector3, point: Point) {
+    mapThreeToParentThree(vec3, _threeParent);
+    parentThreeSceneContext.mapThreeToViewport(_threeParent, point);
   }
 
   function computeFn(event: DomEvent, state: RootState, previous?: RootState) {
@@ -194,6 +272,12 @@ export function ThreeRenderTexture({
             sceneTunnel,
             mapPixiToNdc,
             mapNdcToPixi,
+            mapThreeToParentPixiLocal,
+            mapThreeToParentPixi,
+            mapThreeToParentUv,
+            mapThreeToParentThreeLocal,
+            mapThreeToParentThree,
+            mapThreeToViewport,
           }}
         >
           {createPortal(

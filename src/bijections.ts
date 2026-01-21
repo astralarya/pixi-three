@@ -122,6 +122,17 @@ export function mapUvToNdc(uv: Vector2, ndc: Vector2): void {
 }
 
 /**
+ * Maps Three.js NDC coordinates (-1 to 1) to UV coordinates (0-1).
+ *
+ * @param ndc - Vector2 with NDC coordinates (-1 to 1)
+ * @param uv - Vector2 to store the UV result
+ */
+export function mapNdcToUv(ndc: Vector2, uv: Vector2): void {
+  uv.x = (ndc.x + 1) / 2;
+  uv.y = (-ndc.y + 1) / 2;
+}
+
+/**
  * Maps DOM client coordinates directly to Pixi pixel coordinates within a viewport.
  *
  * @param clientX - DOM clientX coordinate

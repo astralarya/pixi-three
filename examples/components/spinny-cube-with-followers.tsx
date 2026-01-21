@@ -1,8 +1,8 @@
-import { mapUvToThreeLocal } from "@astralarium/pixi-three";
-import { type ThreeElements } from "@react-three/fiber";
-import { Color as PixiColor, type ColorSource } from "pixi.js";
-import { useRef } from "react";
-import { Color, InstancedMesh, Mesh, Object3D, Vector3 } from "three";
+import { useThreeSceneContext } from "@astralarium/pixi-three";
+import { type ThreeElements, useThree } from "@react-three/fiber";
+import { Color as PixiColor, type ColorSource, Point } from "pixi.js";
+import { type RefObject, useRef } from "react";
+import { Color, InstancedMesh, Object3D, Vector3 } from "three";
 
 import { SpinnyCube, type SpinnyCubeProps } from "./spinny-cube";
 import {
@@ -38,10 +38,6 @@ function getNormalFaceKey(normal: Vector3): string {
   }
 }
 
-export interface SpinnyCubeWithFollowersProps extends SpinnyCubeProps {
-  initialColors?: SpinnyStarColors;
-}
-
 function shadedColor(color: ColorSource, shadeOffset = 0): Color {
   const pixiColor = new PixiColor(color);
   const threeColor = new Color(pixiColor.toNumber());
@@ -56,14 +52,24 @@ function shadedColor(color: ColorSource, shadeOffset = 0): Color {
   return threeColor;
 }
 
+export interface SpinnyCubeWithFollowersProps extends SpinnyCubeProps {
+  initialColors?: SpinnyStarColors;
+  /** Ref to closest landmark position in viewport coordinates */
+  landmarkRef?: RefObject<Point | null>;
+  /** Ref to mouse position in viewport coordinates */
+  mousePosRef?: RefObject<Point | null>;
+}
+
 export function SpinnyCubeWithFollowers({
   size = 1,
-  speed = 1,
+  speed,
   initialColors,
+  landmarkRef,
+  mousePosRef,
   ...props
 }: Omit<ThreeElements["mesh"], "ref"> & SpinnyCubeWithFollowersProps) {
-  const meshRef = useRef<Mesh>(null);
   const instancedMeshRef = useRef<InstancedMesh>(null);
+  const { mapThreeToViewport } = useThreeSceneContext();
 
   // Initialize instance colors to trigger shader compilation
   const initializeColors = (mesh: InstancedMesh) => {
@@ -78,63 +84,109 @@ export function SpinnyCubeWithFollowers({
     }
   };
 
+  const camera = useThree((state) => state.camera);
+
   // Reusable objects to avoid allocations per frame
   const _object = new Object3D();
   const _color = new Color();
+  const _viewportPoint = new Point();
+  const _cameraDir = new Vector3();
 
   const handleStarTipsUpdate = (tips: StarTipData[]) => {
-    if (!meshRef.current || !instancedMeshRef.current) return;
+    if (!instancedMeshRef.current) return;
 
     const instancedMesh = instancedMeshRef.current;
-    let instanceIndex = 0;
+    const mousePos = mousePosRef?.current;
 
-    for (const tip of tips) {
-      const results = mapUvToThreeLocal(tip.uv, meshRef.current);
+    // First pass: compute edge scales and find max among visible tips
+    const tipData: { edgeScale: number; isFacingCamera: boolean }[] = [];
+    let maxVisibleEdgeScale = 0;
 
-      for (const result of results) {
-        if (instanceIndex >= MAX_INSTANCES) break;
+    if (mousePos) {
+      camera.getWorldDirection(_cameraDir);
+      _cameraDir.negate();
+    }
 
-        const faceKey = getNormalFaceKey(result.normal);
-        const shadeOffset = FACE_SHADE_OFFSETS[faceKey] ?? 0;
-        const threeColor = shadedColor(tip.color, shadeOffset);
+    for (let i = 0; i < tips.length; i++) {
+      const tip = tips[i];
 
-        // Scale based on distance from face edge using UV coordinates
-        // For a cube, each face spans 0-1 in UV, so distance from edge is min(u, 1-u, v, 1-v)
-        const u = tip.uv.x % 1; // Handle wrapped UVs
-        const v = tip.uv.y % 1;
-        const distFromEdge = Math.min(u, 1 - u, v, 1 - v);
-        // distFromEdge is 0 at edge, 0.5 at center. Scale from 0 to 1.
-        const edgeScale = Math.min(1, distFromEdge * 2);
+      // Scale based on distance from face edge using UV coordinates
+      const u = tip.uv.x % 1;
+      const v = tip.uv.y % 1;
+      const distFromEdge = Math.min(u, 1 - u, v, 1 - v);
+      const edgeScale = Math.min(1, distFromEdge * 2);
 
-        const pos = result.position.clone();
-        pos.addScaledVector(result.normal, 0.15);
-        meshRef.current.localToWorld(pos);
+      const isFacingCamera = mousePos
+        ? tip.normal.dot(_cameraDir) > 0.25
+        : false;
 
-        _object.position.copy(pos);
-        _object.scale.setScalar(edgeScale);
-        _object.updateMatrix();
-        instancedMesh.setMatrixAt(instanceIndex, _object.matrix);
+      tipData.push({ edgeScale, isFacingCamera });
 
-        _color.copy(threeColor);
-        instancedMesh.setColorAt(instanceIndex, _color);
-
-        instanceIndex++;
+      if (isFacingCamera && edgeScale > maxVisibleEdgeScale) {
+        maxVisibleEdgeScale = edgeScale;
       }
     }
 
-    instancedMesh.count = instanceIndex;
+    // Second pass: update instances and find closest landmark
+    let closestTip: { position: Vector3; dist: number } | null = null;
 
+    for (let i = 0; i < tips.length; i++) {
+      const tip = tips[i];
+      const { edgeScale, isFacingCamera } = tipData[i];
+
+      // Update instance transform (offset along normal to float above surface)
+      _object.position.copy(tip.position);
+      _object.position.addScaledVector(tip.normal, 0.15 * (size / 3));
+      _object.scale.setScalar(edgeScale);
+      _object.updateMatrix();
+      instancedMesh.setMatrixAt(i, _object.matrix);
+
+      // Update instance color with face-based shading (use local normal)
+      const faceKey = getNormalFaceKey(tip.localNormal);
+      const shadeOffset = FACE_SHADE_OFFSETS[faceKey] ?? 0;
+      _color.copy(shadedColor(tip.color, shadeOffset));
+      instancedMesh.setColorAt(i, _color);
+
+      // Track closest to mouse for landmark (only visible tips with edgeScale close to max)
+      if (
+        mousePos &&
+        isFacingCamera &&
+        edgeScale >= maxVisibleEdgeScale - 0.1
+      ) {
+        // Use the ball position (offset from surface) for landmark
+        mapThreeToViewport(_object.position, _viewportPoint);
+        const dist = Math.hypot(
+          _viewportPoint.x - mousePos.x,
+          _viewportPoint.y - mousePos.y,
+        );
+        if (!closestTip || dist < closestTip.dist) {
+          closestTip = { position: _object.position.clone(), dist };
+        }
+      }
+    }
+
+    instancedMesh.count = tips.length;
     instancedMesh.instanceMatrix.needsUpdate = true;
     if (instancedMesh.instanceColor) {
       instancedMesh.instanceColor.needsUpdate = true;
+    }
+
+    // Update landmark ref
+    if (landmarkRef) {
+      if (closestTip) {
+        mapThreeToViewport(closestTip.position, _viewportPoint);
+        landmarkRef.current = _viewportPoint.clone();
+      } else {
+        landmarkRef.current = null;
+      }
     }
   };
 
   return (
     <>
-      <SpinnyCube size={size} speed={speed} ref={meshRef} {...props}>
+      <SpinnyCube size={size} speed={speed} {...props}>
         <SpinnyStar
-          speed={speed * 2}
+          speed={speed}
           onStarTipsUpdate={handleStarTipsUpdate}
           initialColors={initialColors}
         />

@@ -2,11 +2,11 @@ import { type EventHandlers } from "@react-three/fiber";
 import { type Container, type Point } from "pixi.js";
 import { createContext, type RefObject, useContext } from "react";
 import { type Object3D, type Vector2 } from "three";
-import type tunnel from "tunnel-rat";
 
 import {
   mapPixiToUv as mapPixiToUvUtil,
   mapUvToPixi as mapUvToPixiUtil,
+  type UvToThreeResult,
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
 import { useCanvasView } from "./canvas-view-context";
@@ -17,7 +17,6 @@ import { useRenderContext } from "./render-context-hooks";
 export interface PixiTextureContextValue {
   width: number;
   height: number;
-  sceneTunnel: ReturnType<typeof tunnel>;
   containerRef: RefObject<Container>;
   getAttachedObject: () => Object3D | undefined;
   /**
@@ -38,7 +37,31 @@ export interface PixiTextureContextValue {
    * @param point - Pixi Point in texture space
    * @param uv - Three.js UV Vector2 to store the result
    */
-  mapPixiToUv: (point: Point, uv: Vector2) => void;
+  mapPixiToParentUv: (point: Point, uv: Vector2) => void;
+  /**
+   * Maps Pixi texture coordinates to local coordinates on the parent Three mesh surface.
+   * @param point - Pixi Point in texture space
+   * @returns Array of results with position/normal in local mesh coords
+   */
+  mapPixiToParentThreeLocal: (point: Point) => UvToThreeResult[];
+  /**
+   * Maps Pixi texture coordinates to world coordinates in the parent Three scene.
+   * @param point - Pixi Point in texture space
+   * @returns Array of results with position/normal in parent world coords
+   */
+  mapPixiToParentThree: (point: Point) => UvToThreeResult[];
+  /**
+   * Maps Pixi texture coordinates to global Pixi parent coordinates.
+   * @param point - Pixi Point in texture space
+   * @param out - Pixi Point to store the result in global Pixi coords
+   */
+  mapPixiToParentPixi: (point: Point, out: Point) => void;
+  /**
+   * Maps local Pixi coordinates to CanvasView viewport coordinates.
+   * @param localPoint - Pixi Point in local texture coordinates
+   * @param viewportPoint - Pixi Point to store the viewport result
+   */
+  mapPixiToViewport: (localPoint: Point, viewportPoint: Point) => void;
 }
 
 /** @internal */
@@ -63,9 +86,35 @@ export function usePixiTextureContextOptional() {
 }
 
 /**
- * Bijection for Pixi coordinates.
+ * Parent Three context for coordinate mapping from PixiTexture to parent Three scene.
+ * Only available inside a PixiTexture context.
  */
-export interface PixiContextBijections {
+export interface PixiViewParentThreeContextValue {
+  /**
+   * Maps Pixi texture coordinates to local coordinates on the parent Three mesh surface.
+   * @param point - Pixi Point in texture space
+   * @returns Array of results with position/normal in local mesh coords
+   */
+  mapPixiToParentThreeLocal: (point: Point) => UvToThreeResult[];
+  /**
+   * Maps Pixi texture coordinates to world coordinates in the parent Three scene.
+   * @param point - Pixi Point in texture space
+   * @returns Array of results with position/normal in parent world coords
+   */
+  mapPixiToParentThree: (point: Point) => UvToThreeResult[];
+  /**
+   * Maps Pixi texture coordinates to global Pixi parent coordinates.
+   * @param point - Pixi Point in texture space
+   * @param out - Pixi Point to store the result in global Pixi coords
+   */
+  mapPixiToParentPixi: (point: Point, out: Point) => void;
+}
+
+/**
+ * Context value for Pixi view coordinate mapping.
+ * Works in PixiTexture (inside ThreeScene) and CanvasView.
+ */
+export interface PixiViewContextValue {
   /** Width of the Pixi container */
   width: number;
   /** Height of the Pixi container */
@@ -82,6 +131,17 @@ export interface PixiContextBijections {
    * @param uv - Three.js UV Vector2 to store the result
    */
   mapPixiToUv: (point: Point, uv: Vector2) => void;
+  /**
+   * Maps local Pixi coordinates to CanvasView viewport coordinates.
+   * @param localPoint - Pixi Point in local coordinates
+   * @param viewportPoint - Pixi Point to store the viewport result
+   */
+  mapPixiToViewport: (localPoint: Point, viewportPoint: Point) => void;
+  /**
+   * Parent Three coordinate mapping functions.
+   * Only available inside a PixiTexture context.
+   */
+  parentThree?: PixiViewParentThreeContextValue;
 }
 
 /**
@@ -95,16 +155,23 @@ export interface PixiContextBijections {
  * @returns Bijection functions for coordinate mapping
  * @throws Error if called outside of a CanvasView
  */
-export function usePixiContext(): PixiContextBijections {
+export function usePixiViewContext(): PixiViewContextValue {
   const textureContext = useContext(PixiTextureContext);
   const viewport = useViewport();
+  const { containerRef } = useCanvasView();
 
   if (textureContext) {
     return {
       width: textureContext.width,
       height: textureContext.height,
       mapUvToPixi: textureContext.mapUvToPixi,
-      mapPixiToUv: textureContext.mapPixiToUv,
+      mapPixiToUv: textureContext.mapPixiToParentUv,
+      mapPixiToViewport: textureContext.mapPixiToViewport,
+      parentThree: {
+        mapPixiToParentThreeLocal: textureContext.mapPixiToParentThreeLocal,
+        mapPixiToParentThree: textureContext.mapPixiToParentThree,
+        mapPixiToParentPixi: textureContext.mapPixiToParentPixi,
+      },
     };
   }
 
@@ -116,6 +183,8 @@ export function usePixiContext(): PixiContextBijections {
       mapUvToPixiUtil(uv, point, bounds),
     mapPixiToUv: (point: Point, uv: Vector2) =>
       mapPixiToUvUtil(point, uv, bounds),
+    mapPixiToViewport: (localPoint: Point, viewportPoint: Point) =>
+      containerRef.current.toGlobal(localPoint, viewportPoint),
   };
 }
 

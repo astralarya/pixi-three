@@ -20,20 +20,30 @@ import {
   useLayoutEffect,
   useRef,
 } from "react";
-import { ExternalTexture, Texture } from "three";
+import {
+  ExternalTexture,
+  Mesh,
+  Texture,
+  Vector2 as Vector2Impl,
+  Vector3,
+} from "three";
 import { texture } from "three/tsl";
 import { type Object3D, type TextureNode, type Vector2 } from "three/webgpu";
-import type tunnel from "tunnel-rat";
 
 import {
   mapPixiToUv as mapPixiToUvUtil,
   mapUvToPixi as mapUvToPixiUtil,
+  mapUvToThree,
+  mapUvToThreeLocal,
 } from "./bijections";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
 import { PixiTextureContext } from "./pixi-texture-context";
 import { useRenderContext } from "./render-context-hooks";
 import { useAttachedObject } from "./three-fiber";
-import { useThreeSceneContext } from "./three-scene-context";
+import {
+  type ThreeSceneContextValue,
+  useThreeSceneContext,
+} from "./three-scene-context";
 import { useBridge } from "./use-bridge";
 import { useRenderSchedule } from "./use-render-schedule";
 
@@ -128,7 +138,7 @@ export function PixiTexture({
 }: PixiTextureProps) {
   const Bridge = useBridge();
   const { pixiTextureTunnel } = useRenderContext();
-  const { sceneTunnel } = useThreeSceneContext();
+  const parentThreeSceneContext = useThreeSceneContext();
   const key = useId();
 
   const getAttachedObject = useAttachedObject(objectRef);
@@ -151,7 +161,7 @@ export function PixiTexture({
       <pixiTextureTunnel.In>
         <Bridge key={key}>
           <PixiTextureInternal
-            sceneTunnel={sceneTunnel}
+            parentThreeSceneContext={parentThreeSceneContext}
             getAttachedObject={getAttachedObject}
             textureRef={textureRef}
             containerRef={containerRef}
@@ -174,8 +184,8 @@ interface PixiTextureInternalProps extends Omit<
   PixiTextureProps,
   "ref" | "objectRef" | "attach"
 > {
-  /** Three Scene Tunnel */
-  sceneTunnel: ReturnType<typeof tunnel>;
+  /** Parent Three Scene Context */
+  parentThreeSceneContext: ThreeSceneContextValue;
   /** Get attached object */
   getAttachedObject: () => Object3D | undefined;
   /** TextureNode Ref */
@@ -183,7 +193,7 @@ interface PixiTextureInternalProps extends Omit<
 }
 
 function PixiTextureInternal({
-  sceneTunnel,
+  parentThreeSceneContext,
   getAttachedObject,
   containerRef: containerRefProp,
   children,
@@ -256,13 +266,55 @@ function PixiTextureInternal({
   }
 
   const bounds = { width, height };
+  const _uv = new Vector2Impl();
+  const _threeParent = new Vector3();
 
   function mapUvToPixi(uv: Vector2, point: Point) {
     mapUvToPixiUtil(uv, point, bounds);
   }
 
-  function mapPixiToUv(point: Point, uv: Vector2) {
+  function mapPixiToParentUv(point: Point, uv: Vector2) {
     mapPixiToUvUtil(point, uv, bounds);
+  }
+
+  function mapPixiToParentThreeLocal(point: Point) {
+    mapPixiToParentUv(point, _uv);
+
+    // Get attached mesh and convert UV to local positions on mesh surface
+    const object = getAttachedObject();
+    if (!object || !(object instanceof Mesh)) {
+      return [];
+    }
+
+    return mapUvToThreeLocal(_uv, object);
+  }
+
+  function mapPixiToParentThree(point: Point) {
+    mapPixiToParentUv(point, _uv);
+
+    // Get attached mesh and convert UV to world positions
+    const object = getAttachedObject();
+    if (!object || !(object instanceof Mesh)) {
+      return [];
+    }
+
+    return mapUvToThree(_uv, object);
+  }
+
+  function mapPixiToParentPixi(point: Point, out: Point) {
+    const results = mapPixiToParentThree(point);
+    if (results.length > 0) {
+      _threeParent.copy(results[0].position);
+      parentThreeSceneContext.mapThreeToParentPixi(_threeParent, out);
+    }
+  }
+
+  function mapPixiToViewport(localPoint: Point, viewportPoint: Point) {
+    const results = mapPixiToParentThree(localPoint);
+    if (results.length > 0) {
+      _threeParent.copy(results[0].position);
+      parentThreeSceneContext.mapThreeToViewport(_threeParent, viewportPoint);
+    }
   }
 
   return (
@@ -271,12 +323,15 @@ function PixiTextureInternal({
         value={{
           width,
           height,
-          sceneTunnel,
           containerRef,
           getAttachedObject,
           hitTest,
           mapUvToPixi,
-          mapPixiToUv,
+          mapPixiToParentUv,
+          mapPixiToParentThreeLocal,
+          mapPixiToParentThree,
+          mapPixiToParentPixi,
+          mapPixiToViewport,
         }}
       >
         <pixiContainer

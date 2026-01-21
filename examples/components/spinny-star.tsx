@@ -1,8 +1,8 @@
-import { useViewport } from "@astralarium/pixi-three";
+import { usePixiViewContext, useViewport } from "@astralarium/pixi-three";
 import { extend, useTick } from "@pixi/react";
 import { type ColorSource, Container, Graphics, Point } from "pixi.js";
 import { type ComponentProps, useRef, useState } from "react";
-import { Vector2 } from "three";
+import { type Vector3 } from "three";
 
 import { pixiRed, threeBlue } from "#components/lib/colors";
 
@@ -31,7 +31,13 @@ export interface SpinnyStarColors {
 }
 
 export interface StarTipData {
-  uv: Vector2;
+  position: Vector3;
+  /** World normal (transformed by mesh rotation), used for camera-facing check */
+  normal: Vector3;
+  /** Local normal (not transformed), used for face shading */
+  localNormal: Vector3;
+  /** UV coordinates (0-1) used for edge scaling */
+  uv: { x: number; y: number };
   color: ColorSource;
 }
 
@@ -48,6 +54,7 @@ export function SpinnyStar({
   ...props
 }: SpinnyStarProps & ComponentProps<"pixiContainer">) {
   const size = useViewport();
+  const { parentThree } = usePixiViewContext();
   const center = new Point(size.width / 2, size.height / 2);
   const scale = Math.min(size.width, size.height);
   const radius = scale / 4;
@@ -75,33 +82,63 @@ export function SpinnyStar({
 
   const time1 = useRef(0);
   const time2 = useRef(0);
+  const _point = useRef(new Point());
+
   useTick((ticker) => {
     time1.current += ticker.deltaMS * (hover1 ? 0.2 : 1) * speed;
     time2.current += ticker.deltaMS * (hover2 ? 0.2 : 1) * speed;
     star1.current.rotation = ((time1.current % 4000) / 4000) * 2 * Math.PI;
     star2.current.scale = Math.sin((time2.current / 1000 / 2) * Math.PI) + 1.5;
 
-    if (onStarTipsUpdate) {
+    if (onStarTipsUpdate && parentThree) {
       const tips: StarTipData[] = [];
 
       for (let i = 0; i < 5; i++) {
         const baseAngle = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
 
+        // Star 1 tip - all faces
         const star1Angle = baseAngle + star1.current.rotation;
-        const star1X = center.x + Math.cos(star1Angle) * radius;
-        const star1Y = center.y + Math.sin(star1Angle) * radius;
-        tips.push({
-          uv: new Vector2(star1X / size.width, star1Y / size.height),
-          color: star1_color,
-        });
+        _point.current.x = center.x + Math.cos(star1Angle) * radius;
+        _point.current.y = center.y + Math.sin(star1Angle) * radius;
+        const star1Uv = {
+          x: _point.current.x / size.width,
+          y: _point.current.y / size.height,
+        };
+        const star1World = parentThree.mapPixiToParentThree(_point.current);
+        const star1Local = parentThree.mapPixiToParentThreeLocal(
+          _point.current,
+        );
+        for (let j = 0; j < star1World.length; j++) {
+          tips.push({
+            position: star1World[j].position.clone(),
+            normal: star1World[j].normal.clone(),
+            localNormal: star1Local[j].normal.clone(),
+            uv: star1Uv,
+            color: star1_color,
+          });
+        }
 
+        // Star 2 tip - all faces
         const currentRadius = radius * star2.current.scale.x;
-        const star2X = center.x + Math.cos(baseAngle) * currentRadius;
-        const star2Y = center.y + Math.sin(baseAngle) * currentRadius;
-        tips.push({
-          uv: new Vector2(star2X / size.width, star2Y / size.height),
-          color: star2_color,
-        });
+        _point.current.x = center.x + Math.cos(baseAngle) * currentRadius;
+        _point.current.y = center.y + Math.sin(baseAngle) * currentRadius;
+        const star2Uv = {
+          x: _point.current.x / size.width,
+          y: _point.current.y / size.height,
+        };
+        const star2World = parentThree.mapPixiToParentThree(_point.current);
+        const star2Local = parentThree.mapPixiToParentThreeLocal(
+          _point.current,
+        );
+        for (let j = 0; j < star2World.length; j++) {
+          tips.push({
+            position: star2World[j].position.clone(),
+            normal: star2World[j].normal.clone(),
+            localNormal: star2Local[j].normal.clone(),
+            uv: star2Uv,
+            color: star2_color,
+          });
+        }
       }
 
       onStarTipsUpdate(tips);
