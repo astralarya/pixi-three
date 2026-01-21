@@ -1,4 +1,4 @@
-import { BoxIcon, LinkIcon } from "lucide-react";
+import { BoxIcon, Github, LinkIcon } from "lucide-react";
 import * as React from "react";
 
 import {
@@ -7,6 +7,14 @@ import {
 } from "#components/hooks/use-canvas-recorder";
 import { cn } from "#components/lib/utils";
 import { Button } from "#components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "#components/ui/navigation-menu";
 
 interface FrameProps {
   children: React.ReactNode;
@@ -31,26 +39,59 @@ export function Frame({
         <h1 className="text-xl font-semibold">{title}</h1>
         {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
         {sourceUrl && (
-          <div className="ml-auto flex items-center gap-4">
-            <a
-              href={sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground flex items-center gap-1 text-sm hover:underline"
-            >
-              <LinkIcon className="h-4 w-4" />
-              Source
-            </a>
-            <a
-              href={`https://codesandbox.io/p/github/astralarium/pixi-three/main?file=${encodeURIComponent("/" + sourceUrl.split("/blob/main/")[1])}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground flex items-center gap-1 text-sm hover:underline"
-            >
-              <BoxIcon className="h-4 w-4" />
-              CodeSandbox
-            </a>
-          </div>
+          <>
+            {/* Desktop: show both links */}
+            <div className="ml-auto flex items-center gap-4 max-sm:hidden">
+              <a
+                href={sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground flex items-center gap-1 text-sm hover:underline"
+              >
+                <Github className="h-4 w-4" />
+                Source
+              </a>
+              <a
+                href={`https://codesandbox.io/p/github/astralarium/pixi-three/main?file=${encodeURIComponent("/" + sourceUrl.split("/blob/main/")[1])}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground flex items-center gap-1 text-sm hover:underline"
+              >
+                <BoxIcon className="h-4 w-4" />
+                CodeSandbox
+              </a>
+            </div>
+            {/* Mobile: dropdown menu */}
+            <NavigationMenu className="ml-auto sm:hidden">
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="bg-transparent px-2">
+                    <LinkIcon className="h-4 w-4" />
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <NavigationMenuLink
+                      href={sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-row items-center gap-2"
+                    >
+                      <Github className="h-4 w-4" />
+                      Source
+                    </NavigationMenuLink>
+                    <NavigationMenuLink
+                      href={`https://codesandbox.io/p/github/astralarium/pixi-three/main?file=${encodeURIComponent("/" + sourceUrl.split("/blob/main/")[1])}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-row items-center gap-2"
+                    >
+                      <BoxIcon className="h-4 w-4" />
+                      CodeSandbox
+                    </NavigationMenuLink>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </>
         )}
       </header>
       {children}
