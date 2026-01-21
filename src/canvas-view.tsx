@@ -127,6 +127,7 @@ export function CanvasView({
             WebkitUserSelect: "none",
             WebkitTouchCallout: "none",
           }}
+          // eslint-disable-next-line react-hooks/refs
           {...pixiDomEvents?.bind(canvasRef, containerRef)}
         >
           {fallback}

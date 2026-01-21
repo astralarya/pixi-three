@@ -168,6 +168,7 @@ export function PixiTexture({
           </PixiTextureInternal>
         </Bridge>
       </pixiTextureTunnel.In>
+      {/* eslint-disable-next-line react-hooks/refs */}
       <primitive object={textureRef.current} attach={attach} />
     </>
   );
