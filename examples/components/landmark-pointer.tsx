@@ -1,7 +1,7 @@
 import { useViewport } from "@astralarium/pixi-three";
 import { extend, useTick } from "@pixi/react";
 import { type ColorSource, Graphics, Point, Rectangle } from "pixi.js";
-import { type ComponentProps, type RefObject, useRef } from "react";
+import { type ComponentProps, type RefObject, useEffect, useRef } from "react";
 
 extend({ Graphics });
 
@@ -87,16 +87,38 @@ export function LandmarkPointer({
 
 export function PointerTapHandler({
   mousePosRef,
+  canvasRef,
 }: {
   mousePosRef: RefObject<Point | null>;
+  canvasRef?: RefObject<HTMLCanvasElement | null>;
 }) {
   const size = useViewport();
+
+  useEffect(() => {
+    if (!canvasRef) return;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      const canvas = canvasRef.current;
+      if (canvas && !canvas.contains(e.target as Node)) {
+        mousePosRef.current = null;
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [canvasRef, mousePosRef]);
+
   return (
     <pixiContainer
       eventMode="static"
       hitArea={new Rectangle(0, 0, size.width, size.height)}
       onPointerTap={(e: { global: Point }) => {
         mousePosRef.current = e.global.clone();
+      }}
+      onPointerLeave={(e: { pointerType: string }) => {
+        if (e.pointerType === "mouse") {
+          mousePosRef.current = null;
+        }
       }}
     />
   );

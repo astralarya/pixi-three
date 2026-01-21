@@ -31,7 +31,7 @@ function Bijections() {
     >
       <RenderContext>
         <CanvasView alpha canvasRef={canvasRef}>
-          <PointerTapHandler mousePosRef={mousePosRef} />
+          <PointerTapHandler mousePosRef={mousePosRef} canvasRef={canvasRef} />
           <FadeIn>
             <ThreeScene>
               <SpinnyCubeWithFollowers
