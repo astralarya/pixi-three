@@ -10,10 +10,8 @@ import {
   Point,
   type Renderer,
 } from "pixi.js";
-import { type RefObject } from "react";
 
-/** Constant {@link https://pixijs.download/release/docs/maths.Point.html | Point} indicating no intersection `new Point(-Infinity, -Infinity)` */
-export const MISSED_POINT = new Point(-Infinity, -Infinity);
+const MISSED_POINT = new Point(-Infinity, -Infinity);
 
 const MOUSE_POINTER_ID = 1;
 
@@ -42,115 +40,99 @@ interface PixiPointerEvent extends PointerEvent {
   type: string;
 }
 
-interface PixiRootEvents {
+export interface PixiRootEvents {
   pointerEvent: FederatedPointerEvent;
   wheelEvent: FederatedWheelEvent;
 }
 
 /**
- * Options for binding events to Pixi.js containers.
- *
- * @see {@link https://pixijs.download/release/docs/scene.Container.html | Pixi Container}
- * @see {@link https://pixijs.download/release/docs/events.EventBoundary.html | Pixi EventBoundary}
- */
-export interface BindEventOptions<
-  TEvent,
-  TEventHandlers = Record<string, (event: TEvent) => void>,
-> {
-  container: RefObject<Container>;
-  eventBoundary?: string | EventBoundary;
-  guard?: EventGuard<TEvent, TEventHandlers>;
-}
-
-export type EventGuard<
-  TEvent,
-  TEventHandlers = Record<string, (event: TEvent) => void>,
-> =
-  | ((event: TEvent) => boolean)
-  | {
-      [K in keyof TEventHandlers]?: TEventHandlers[K] extends (
-        event: infer E,
-      ) => void
-        ? (event: E) => boolean
-        : never;
-    };
-
-/**
- * A synthetic event system that serves as a base class
- * for custom event systems.
+ * A synthetic event system for Pixi
  *
  * @see {@link https://pixijs.download/release/docs/events.EventSystem.html | Pixi EventSystem}
  * @see {@link https://pixijs.download/release/docs/events.EventBoundary.html | Pixi EventBoundary}
  * @see {@link https://pixijs.download/release/docs/events.FederatedPointerEvent.html | Pixi FederatedPointerEvent}
  */
-export class PixiSyntheticEventSystem<
-  TEvent,
-  TEventHandlers = Record<string, (event: TEvent) => void>,
-> extends EventSystem {
-  private _eventBoundaries: Record<string, EventBoundary>;
-  private _rootEvents: Record<string, PixiRootEvents>;
-
+export class PixiSyntheticEventSystem extends EventSystem {
   constructor(renderer: Renderer) {
     super(renderer);
 
     this.domElement = renderer.events.domElement;
     Object.assign(this.features, { move: true, click: true, wheel: true });
-
-    this._eventBoundaries = {};
-    this._rootEvents = {};
   }
 
   /**
-   * Named event boundaries, created lazily.
+   * Dispatches an event directly to a Pixi container.
+   *
+   * @param event - The DOM event
+   * @param point - The point in Pixi texture space, or null to signal missed/out
+   * @param container - The Pixi container to dispatch events to
+   * @param eventBoundary - The event boundary for the container
+   * @param rootEvents - Root federated events for pointer and wheel
+   * @param domElement - The DOM element for coordinate mapping
    */
-  public get eventBoundaries(): Record<string, EventBoundary> {
-    return new Proxy(this._eventBoundaries, {
-      get: (target, key: string) => {
-        if (!(key in target)) {
-          target[key] = new EventBoundary();
-          this._rootEvents[key] = {
-            pointerEvent: new FederatedPointerEvent(target[key]),
-            wheelEvent: new FederatedWheelEvent(target[key]),
-          };
-        }
-        return target[key];
-      },
-    });
-  }
-
-  /**
-   * Named root events, created lazily.
-   */
-  public get rootEvents(): Record<string, PixiRootEvents> {
-    return new Proxy(this._rootEvents, {
-      get: (target, key: string) => {
-        if (!(key in target)) {
-          this._eventBoundaries[key] = new EventBoundary();
-          target[key] = {
-            pointerEvent: new FederatedPointerEvent(this._eventBoundaries[key]),
-            wheelEvent: new FederatedWheelEvent(this._eventBoundaries[key]),
-          };
-        }
-        return target[key];
-      },
-    });
-  }
-
-  /**
-   * Maps an event to a point in the container's coordinate space.
-   * Override this method in subclasses for custom coordinate mapping.
-   * @param point - The point to store the mapped coordinates in
-   * @param event - The source event
-   * @param _eventBoundary - The event boundary
-   */
-  protected mapEventToPoint(
-    point: Point,
+  public dispatch(
     event: Event,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _eventBoundary: EventBoundary,
+    point: Point | null,
+    container: Container,
+    eventBoundary: EventBoundary,
+    rootEvents: PixiRootEvents,
+    domElement: HTMLElement,
   ): void {
-    const mouseEvent = event as MouseEvent;
-    this.mapPositionToPoint(point, mouseEvent.clientX, mouseEvent.clientY);
+    this.domElement = domElement;
+
+    const eventPoint = point ?? MISSED_POINT;
+
+    eventBoundary.rootTarget = container;
+
+    const type = event.type;
+    if (
+      type === "pointerdown" ||
+      type === "mousedown" ||
+      type === "touchstart"
+    ) {
+      this.handlePointerDown(
+        event,
+        eventBoundary,
+        rootEvents.pointerEvent,
+        eventPoint,
+      );
+    } else if (
+      type === "pointermove" ||
+      type === "mousemove" ||
+      type === "touchmove"
+    ) {
+      this.handlePointerMove(
+        event,
+        eventBoundary,
+        rootEvents.pointerEvent,
+        eventPoint,
+      );
+    } else if (
+      type === "pointerup" ||
+      type === "mouseup" ||
+      type === "touchend"
+    ) {
+      this.handlePointerUp(
+        event,
+        eventBoundary,
+        rootEvents.pointerEvent,
+        eventPoint,
+      );
+    } else if (
+      type === "pointerover" ||
+      type === "pointerout" ||
+      type === "pointerenter" ||
+      type === "pointerleave"
+    ) {
+      this.handlePointerOverOut(
+        event,
+        eventBoundary,
+        rootEvents.pointerEvent,
+        eventPoint,
+      );
+    } else if (type === "wheel") {
+      this.handleWheel(event, eventBoundary, rootEvents.wheelEvent, eventPoint);
+    }
   }
 
   /**
@@ -271,14 +253,12 @@ export class PixiSyntheticEventSystem<
    * Bootstraps a FederatedPointerEvent from a pointer event source.
    * @param federatedEvent - The federated event to populate
    * @param sourceEvent - The source pointer event
-   * @param originalEvent - The original event before normalization
-   * @param eventBoundary - The event boundary context for coordinate mapping
+   * @param eventPoint - The point in container coordinates
    */
   protected bootstrapPointerEvent<T extends PointerEvent>(
     federatedEvent: FederatedPointerEvent,
     sourceEvent: T,
-    originalEvent: Event,
-    eventBoundary: EventBoundary,
+    eventPoint: Point,
   ): void {
     federatedEvent.originalEvent = null!;
     federatedEvent.nativeEvent = sourceEvent;
@@ -296,9 +276,9 @@ export class PixiSyntheticEventSystem<
 
     this.transferMouseData(federatedEvent, sourceEvent);
 
-    this.mapEventToPoint(federatedEvent.screen, originalEvent, eventBoundary);
-    federatedEvent.global.copyFrom(federatedEvent.screen);
-    federatedEvent.offset.copyFrom(federatedEvent.screen);
+    federatedEvent.screen.copyFrom(eventPoint);
+    federatedEvent.global.copyFrom(eventPoint);
+    federatedEvent.offset.copyFrom(eventPoint);
 
     federatedEvent.isTrusted = sourceEvent.isTrusted;
     if (federatedEvent.type === "pointerleave") {
@@ -318,11 +298,13 @@ export class PixiSyntheticEventSystem<
    * @param sourceEvent - The source pointer/mouse/touch event (may be wrapped)
    * @param eventBoundary - The event boundary to map events through
    * @param rootEvent - The root federated pointer event
+   * @param eventPoint - The point in container coordinates
    */
   protected handlePointerDown<T = TouchEvent | MouseEvent | PointerEvent>(
     sourceEvent: T,
     eventBoundary: EventBoundary,
     rootEvent: FederatedPointerEvent,
+    eventPoint: Point,
   ): void {
     const events = this.normalizeToPointerData(
       sourceEvent as TouchEvent | MouseEvent | PointerEvent,
@@ -330,12 +312,7 @@ export class PixiSyntheticEventSystem<
 
     for (let i = 0, j = events.length; i < j; i++) {
       const nativeEvent = events[i];
-      this.bootstrapPointerEvent(
-        rootEvent,
-        nativeEvent,
-        sourceEvent as Event,
-        eventBoundary,
-      );
+      this.bootstrapPointerEvent(rootEvent, nativeEvent, eventPoint);
       eventBoundary.mapEvent(rootEvent);
     }
 
@@ -347,11 +324,13 @@ export class PixiSyntheticEventSystem<
    * @param sourceEvent - The source pointer/mouse/touch event (may be wrapped)
    * @param eventBoundary - The event boundary to map events through
    * @param rootEvent - The root federated pointer event
+   * @param eventPoint - The point in container coordinates
    */
   protected handlePointerMove<T = TouchEvent | MouseEvent | PointerEvent>(
     sourceEvent: T,
     eventBoundary: EventBoundary,
     rootEvent: FederatedPointerEvent,
+    eventPoint: Point,
   ): void {
     if (!this.features.move) return;
 
@@ -362,12 +341,7 @@ export class PixiSyntheticEventSystem<
     );
 
     for (let i = 0, j = normalizedEvents.length; i < j; i++) {
-      this.bootstrapPointerEvent(
-        rootEvent,
-        normalizedEvents[i],
-        sourceEvent as Event,
-        eventBoundary,
-      );
+      this.bootstrapPointerEvent(rootEvent, normalizedEvents[i], eventPoint);
       eventBoundary.mapEvent(rootEvent);
     }
 
@@ -379,11 +353,13 @@ export class PixiSyntheticEventSystem<
    * @param sourceEvent - The source pointer/mouse/touch event (may be wrapped)
    * @param eventBoundary - The event boundary to map events through
    * @param rootEvent - The root federated pointer event
+   * @param eventPoint - The point in container coordinates
    */
   protected handlePointerUp<T = TouchEvent | MouseEvent | PointerEvent>(
     sourceEvent: T,
     eventBoundary: EventBoundary,
     rootEvent: FederatedPointerEvent,
+    eventPoint: Point,
   ): void {
     if (!this.features.click) return;
 
@@ -396,12 +372,7 @@ export class PixiSyntheticEventSystem<
     );
 
     for (let i = 0, j = normalizedEvents.length; i < j; i++) {
-      this.bootstrapPointerEvent(
-        rootEvent,
-        normalizedEvents[i],
-        sourceEvent as Event,
-        eventBoundary,
-      );
+      this.bootstrapPointerEvent(rootEvent, normalizedEvents[i], eventPoint);
       rootEvent.type += outside;
       eventBoundary.mapEvent(rootEvent);
     }
@@ -414,11 +385,13 @@ export class PixiSyntheticEventSystem<
    * @param sourceEvent - The source pointer/mouse/touch event (may be wrapped)
    * @param eventBoundary - The event boundary to map events through
    * @param rootEvent - The root federated pointer event
+   * @param eventPoint - The point in container coordinates
    */
   protected handlePointerOverOut<T = TouchEvent | MouseEvent | PointerEvent>(
     sourceEvent: T,
     eventBoundary: EventBoundary,
     rootEvent: FederatedPointerEvent,
+    eventPoint: Point,
   ): void {
     if (!this.features.click) return;
 
@@ -427,12 +400,7 @@ export class PixiSyntheticEventSystem<
     );
 
     for (let i = 0, j = normalizedEvents.length; i < j; i++) {
-      this.bootstrapPointerEvent(
-        rootEvent,
-        normalizedEvents[i],
-        sourceEvent as Event,
-        eventBoundary,
-      );
+      this.bootstrapPointerEvent(rootEvent, normalizedEvents[i], eventPoint);
       eventBoundary.mapEvent(rootEvent);
     }
 
@@ -444,11 +412,13 @@ export class PixiSyntheticEventSystem<
    * @param sourceEvent - The source wheel event (may be wrapped)
    * @param eventBoundary - The event boundary to map events through
    * @param rootEvent - The root federated wheel event
+   * @param eventPoint - The point in container coordinates
    */
   protected handleWheel<T = WheelEvent>(
     sourceEvent: T,
     eventBoundary: EventBoundary,
     rootEvent: FederatedWheelEvent,
+    eventPoint: Point,
   ): void {
     if (!this.features.wheel) return;
 
@@ -462,115 +432,13 @@ export class PixiSyntheticEventSystem<
     rootEvent.deltaZ = wheelEvent.deltaZ;
     rootEvent.deltaMode = wheelEvent.deltaMode;
 
-    this.mapEventToPoint(rootEvent.screen, sourceEvent as Event, eventBoundary);
-    rootEvent.global.copyFrom(rootEvent.screen);
-    rootEvent.offset.copyFrom(rootEvent.screen);
+    rootEvent.screen.copyFrom(eventPoint);
+    rootEvent.global.copyFrom(eventPoint);
+    rootEvent.offset.copyFrom(eventPoint);
 
     rootEvent.nativeEvent = wheelEvent;
     rootEvent.type = wheelEvent.type;
 
     eventBoundary.mapEvent(rootEvent);
-  }
-
-  /**
-   * Generic factory for event handler bindings.
-   * @param input - Container(s) or bind options
-   * @param handlers - Optional event handlers to chain
-   * @param keys - Event handler keys to generate
-   * @returns Event handlers object with generated bindings
-   */
-  protected bindFactory(
-    keys: {
-      key: keyof TEventHandlers;
-      handler:
-        | "handlePointerDown"
-        | "handlePointerMove"
-        | "handlePointerUp"
-        | "handlePointerOverOut"
-        | "handleWheel";
-    }[],
-    domElement: RefObject<HTMLElement>,
-    input:
-      | RefObject<Container>
-      | BindEventOptions<TEvent, TEventHandlers>
-      | (RefObject<Container> | BindEventOptions<TEvent, TEventHandlers>)[],
-    handlers?: Partial<TEventHandlers>,
-  ): Partial<TEventHandlers> {
-    const options = (Array.isArray(input) ? input : [input]).map((item) => {
-      if (Object.hasOwn(item as object, "current")) {
-        return {
-          container: item,
-          eventBoundary: new EventBoundary(),
-        } as BindEventOptions<TEvent, TEventHandlers>;
-      } else if (!Object.hasOwn(item as object, "eventBoundary")) {
-        return {
-          ...item,
-          eventBoundary: new EventBoundary(),
-        } as BindEventOptions<TEvent, TEventHandlers>;
-      } else {
-        return item as BindEventOptions<TEvent, TEventHandlers>;
-      }
-    });
-
-    const containers = options.map((opt) => opt.container);
-
-    const eventBoundaries = options.map((opt) => {
-      const spec = opt.eventBoundary;
-      if (typeof spec === "string") {
-        return this.eventBoundaries[spec];
-      }
-      return spec ?? new EventBoundary();
-    });
-
-    const rootEvents = options.map((opt, idx) => {
-      const spec = opt.eventBoundary;
-      if (typeof spec === "string") {
-        return this.rootEvents[spec];
-      }
-      return {
-        pointerEvent: new FederatedPointerEvent(eventBoundaries[idx]),
-        wheelEvent: new FederatedWheelEvent(eventBoundaries[idx]),
-      };
-    });
-
-    const testGuard = <E extends TEvent>(
-      eventName: keyof TEventHandlers,
-      event: E,
-      idx: number,
-    ): boolean => {
-      const guard = options[idx].guard;
-      if (!guard) return true;
-      if (typeof guard === "function") {
-        return guard(event);
-      }
-      const eventGuard = guard[eventName];
-      if (!eventGuard) return true;
-      return eventGuard(event);
-    };
-
-    const result: Partial<TEventHandlers> = {};
-
-    for (const { key, handler } of keys) {
-      result[key] = ((event: TEvent) => {
-        (handlers?.[key] as ((event: TEvent) => void) | undefined)?.(event);
-        for (const [idx, containerRef] of containers.entries()) {
-          if (containerRef.current) {
-            const testResult = testGuard(key, event, idx);
-            eventBoundaries[idx].rootTarget = containerRef.current;
-            const eventToHandle = testResult ? event : event;
-            this.domElement = domElement.current;
-            this[handler](
-              eventToHandle,
-              eventBoundaries[idx],
-              rootEvents[idx][
-                key === "handleWheel" ? "wheelEvent" : "pointerEvent"
-              ] as FederatedPointerEvent & FederatedWheelEvent,
-            );
-          }
-        }
-      }) as TEventHandlers[keyof TEventHandlers];
-    }
-
-    return result;
   }
 }

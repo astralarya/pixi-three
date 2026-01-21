@@ -1,10 +1,15 @@
 import { extend, useApplication, useTick } from "@pixi/react";
-import { type AttachType } from "@react-three/fiber";
+import {
+  type AttachType,
+  createPortal,
+  type DomEvent,
+  type RootState,
+} from "@react-three/fiber";
 import {
   Container,
   EventBoundary,
   type GpuTextureSystem,
-  type Point,
+  Point,
   Rectangle,
   RenderTexture,
   TextureSource,
@@ -18,16 +23,19 @@ import {
   useImperativeHandle,
   useLayoutEffect,
   useRef,
+  useState,
 } from "react";
 import {
   ExternalTexture,
+  type Intersection,
   Mesh,
+  Scene,
   Texture,
-  Vector2 as Vector2Impl,
+  Vector2,
   Vector3,
 } from "three";
 import { texture } from "three/tsl";
-import { type Object3D, type TextureNode, type Vector2 } from "three/webgpu";
+import { type Object3D, type TextureNode } from "three/webgpu";
 
 import {
   mapPixiToUv as mapPixiToUvUtil,
@@ -36,6 +44,7 @@ import {
   mapUvToThreeLocal,
 } from "./bijections";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
+import { useCanvasView } from "./canvas-view-context";
 import { PixiTextureContext } from "./pixi-texture-context";
 import { useRenderContext } from "./render-context-hooks";
 import { useAttachedObject } from "./three-fiber";
@@ -44,6 +53,7 @@ import {
   useThreeSceneContext,
 } from "./three-scene-context";
 import { useBridge } from "./use-bridge";
+import { usePixiEventDispatch } from "./use-pixi-event-dispatch";
 import { useRenderSchedule } from "./use-render-schedule";
 
 extend({ Container });
@@ -91,7 +101,15 @@ export interface PixiTextureProps extends PropsWithChildren {
   frameloop?: "always" | "demand";
   /** Optional FPS limit */
   fpsLimit?: number;
+  /** Enable event handling, defaults to true */
+  events?: boolean;
+  /** Optional event priority, defaults to 0 */
+  eventPriority?: number;
+  /** Optional guard to filter events */
+  eventGuard?: PixiTextureEventGuard;
 }
+
+export type PixiTextureEventGuard = (intersections: Intersection[]) => boolean;
 
 /**
  * A {@link https://threejs.org/docs/#TextureNode | Three TextureNode}
@@ -129,6 +147,9 @@ export function PixiTexture({
   height,
   frameloop,
   fpsLimit,
+  events,
+  eventPriority,
+  eventGuard,
 }: PixiTextureProps) {
   const Bridge = useBridge();
   const { pixiTextureTunnel } = useRenderContext();
@@ -163,6 +184,9 @@ export function PixiTexture({
             height={height}
             frameloop={frameloop}
             fpsLimit={fpsLimit}
+            events={events}
+            eventPriority={eventPriority}
+            eventGuard={eventGuard}
           >
             {children}
           </PixiTextureInternal>
@@ -196,11 +220,72 @@ function PixiTextureInternal({
   height,
   frameloop,
   fpsLimit,
+  events,
+  eventPriority,
+  eventGuard,
 }: PixiTextureInternalProps) {
   const app = useApplication();
+  const { canvasRef } = useCanvasView();
 
   const containerRef = useRef<Container>(null!);
   const pixiTextureRef = useRef(new RenderTexture());
+
+  const [eventScene] = useState(() => new Scene());
+  const dispatchEvent = usePixiEventDispatch({
+    containerRef,
+    canvasRef,
+  });
+
+  // Track whether we were over the mesh on the previous event
+  const wasOverRef = useRef(false);
+  // Reusable point for UV to Pixi mapping
+  const _point = new Point();
+
+  function computeFn(event: DomEvent, _state: RootState, previous?: RootState) {
+    if (!previous) return false;
+
+    // Call parent's compute first to set up raycaster
+    const status = previous.events.compute?.(
+      event,
+      previous,
+      previous.previousRoot?.getState(),
+    ) as void | false;
+
+    // If parent compute returns false (e.g., pointer not over ThreeScene sprite),
+    // we still need to dispatch null if we were previously over
+    if (status === false) {
+      if (wasOverRef.current) {
+        dispatchEvent(event, null);
+        wasOverRef.current = false;
+      }
+      return false;
+    }
+
+    const object = getAttachedObject();
+    if (!object) return false;
+
+    const intersections = previous.raycaster.intersectObject(object);
+    const testGuard = eventGuard?.(intersections) ?? true;
+    const [intersection] = intersections;
+    const uv = intersection?.uv;
+    if (uv) {
+      mapUvToPixi(uv, _point);
+    }
+
+    const point: Point | null = uv && testGuard ? _point : null;
+
+    const isOver = point !== null;
+
+    // Dispatch to Pixi if we have a point OR if we were previously over
+    // (to send null for proper pointer out/leave handling)
+    if (isOver || wasOverRef.current) {
+      dispatchEvent(event, point);
+    }
+
+    wasOverRef.current = isOver;
+
+    return false;
+  }
 
   const { isFrameRequested, invalidate, signalFrame } = useRenderSchedule({
     fpsLimit,
@@ -258,8 +343,6 @@ function PixiTextureInternal({
   }
 
   const bounds = { width, height };
-  const _uv = new Vector2Impl();
-  const _threeParent = new Vector3();
 
   function mapUvToPixi(uv: Vector2, point: Point) {
     mapUvToPixiUtil(uv, point, bounds);
@@ -268,6 +351,8 @@ function PixiTextureInternal({
   function mapPixiToParentUv(point: Point, uv: Vector2) {
     mapPixiToUvUtil(point, uv, bounds);
   }
+
+  const _uv = new Vector2();
 
   function mapPixiToParentThreeLocal(point: Point) {
     mapPixiToParentUv(point, _uv);
@@ -293,6 +378,8 @@ function PixiTextureInternal({
     return mapUvToThree(_uv, object);
   }
 
+  const _threeParent = new Vector3();
+
   function mapPixiToParentPixi(point: Point, out: Point) {
     const results = mapPixiToParentThree(point);
     if (results.length > 0) {
@@ -310,31 +397,44 @@ function PixiTextureInternal({
   }
 
   return (
-    <CanvasTreeContext value={{ store, invalidate }}>
-      <PixiTextureContext
-        value={{
-          width,
-          height,
-          containerRef,
-          getAttachedObject,
-          hitTest,
-          mapUvToPixi,
-          mapPixiToParentUv,
-          mapPixiToParentThreeLocal,
-          mapPixiToParentThree,
-          mapPixiToParentPixi,
-          mapPixiToViewport,
-        }}
-      >
-        <pixiContainer
-          ref={containerRef}
-          width={width}
-          height={height}
-          hitArea={new Rectangle(0, 0, width, height)}
+    <>
+      {/* eslint-disable react-hooks/refs -- computeFn does not access during render */}
+      {events !== false && (
+        <parentThreeSceneContext.sceneTunnel.In>
+          {createPortal(<group onPointerOver={() => null} />, eventScene, {
+            events: {
+              compute: computeFn,
+              priority: eventPriority ?? 0,
+            },
+          })}
+        </parentThreeSceneContext.sceneTunnel.In>
+      )}
+      <CanvasTreeContext value={{ store, invalidate }}>
+        <PixiTextureContext
+          value={{
+            width,
+            height,
+            containerRef,
+            getAttachedObject,
+            hitTest,
+            mapUvToPixi,
+            mapPixiToParentUv,
+            mapPixiToParentThreeLocal,
+            mapPixiToParentThree,
+            mapPixiToParentPixi,
+            mapPixiToViewport,
+          }}
         >
-          {children}
-        </pixiContainer>
-      </PixiTextureContext>
-    </CanvasTreeContext>
+          <pixiContainer
+            ref={containerRef}
+            width={width}
+            height={height}
+            hitArea={new Rectangle(0, 0, width, height)}
+          >
+            {children}
+          </pixiContainer>
+        </PixiTextureContext>
+      </CanvasTreeContext>
+    </>
   );
 }

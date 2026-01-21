@@ -3,9 +3,8 @@ import type { Application as ApplicationType } from "pixi.js";
 import { type ReactNode, useRef, useState } from "react";
 import tunnel from "tunnel-rat";
 
-import { PixiDomEventSystem } from "./pixi-dom-event-system";
+import { PixiSyntheticEventSystem } from "./pixi-synthetic-event-system";
 import { PixiTextureRenderer } from "./pixi-texture";
-import { PixiThreeEventSystem } from "./pixi-three-event-system";
 import { RenderContextValue } from "./render-context-hooks";
 import { ThreeRoot, type ThreeRootBaseProps } from "./three-root";
 import { ThreeSceneRenderer } from "./three-scene";
@@ -52,19 +51,15 @@ export function RenderContext({
 }: RenderContextProps) {
   const eventContainer = useRef<HTMLDivElement>(null!);
 
-  const [pixiDomEvents, setPixiDomEvents] = useState<PixiDomEventSystem | null>(
+  const [pixiEvents, setPixiEvents] = useState<PixiSyntheticEventSystem | null>(
     null,
   );
-  const [pixiTextureEvents, setPixiTextureEvents] =
-    useState<PixiThreeEventSystem | null>(null);
 
   function setPixiApplication(app: ApplicationType | null) {
     if (!app) {
-      setPixiDomEvents(null);
-      setPixiTextureEvents(null);
+      setPixiEvents(null);
     } else {
-      setPixiDomEvents(new PixiDomEventSystem(app.renderer));
-      setPixiTextureEvents(new PixiThreeEventSystem(app.renderer));
+      setPixiEvents(new PixiSyntheticEventSystem(app.renderer));
     }
   }
 
@@ -78,10 +73,9 @@ export function RenderContext({
         value={{
           tunnel: canvasViewTunnel,
           eventContainer,
-          pixiDomEvents,
+          pixiEvents,
           threeSceneTunnel,
           pixiTextureTunnel,
-          pixiTextureEvents,
         }}
       >
         <Application

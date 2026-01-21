@@ -1,4 +1,3 @@
-import { type EventHandlers } from "@react-three/fiber";
 import { type Container, type Point } from "pixi.js";
 import { createContext, type RefObject, useContext } from "react";
 import { type Object3D, type Vector2 } from "three";
@@ -10,8 +9,6 @@ import {
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
 import { useCanvasView } from "./canvas-view-context";
-import { type PixiThreeEventBindOptions } from "./pixi-three-event-system";
-import { useRenderContext } from "./render-context-hooks";
 
 /** @internal */
 export interface PixiTextureContextValue {
@@ -186,25 +183,4 @@ export function usePixiViewContext(): PixiViewContextValue {
     mapPixiToViewport: (localPoint: Point, viewportPoint: Point) =>
       containerRef.current.toGlobal(localPoint, viewportPoint),
   };
-}
-
-/**
- * Hook for binding {@link https://r3f.docs.pmnd.rs/api/events | React Three Fiber Events}
- * to Pixi containers within a {@link PixiTexture}.
- *
- * @category hook
- * @param container - {@link https://pixijs.download/release/docs/scene.Container.html | Container}(s) or bind options
- * @param handlers - Optional event handlers to chain
- * @returns EventHandlers to bind to a react-three-fiber mesh
- */
-export function usePixiTextureEvents(
-  container:
-    | RefObject<Container>
-    | PixiThreeEventBindOptions
-    | (RefObject<Container> | PixiThreeEventBindOptions)[],
-  handlers?: EventHandlers,
-) {
-  const { pixiTextureEvents } = useRenderContext();
-  const { canvasRef } = useCanvasView();
-  return pixiTextureEvents?.bind(canvasRef, container, handlers);
 }

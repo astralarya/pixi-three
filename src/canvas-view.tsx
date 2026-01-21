@@ -1,6 +1,13 @@
 import { extend, useApplication, useTick } from "@pixi/react";
-import { CanvasSource, Container, Rectangle, RenderTarget } from "pixi.js";
 import {
+  CanvasSource,
+  Container,
+  Point,
+  Rectangle,
+  RenderTarget,
+} from "pixi.js";
+import {
+  type PointerEvent as ReactPointerEvent,
   type PropsWithChildren,
   type ReactNode,
   type Ref,
@@ -12,9 +19,11 @@ import {
   useState,
 } from "react";
 
+import { mapClientToViewport } from "./bijections";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
 import { CanvasViewContext as CanvasViewContentContext } from "./canvas-view-context";
 import { useRenderContext } from "./render-context-hooks";
+import { usePixiEventDispatch } from "./use-pixi-event-dispatch";
 import { useRenderSchedule } from "./use-render-schedule";
 
 extend({ Container });
@@ -78,11 +87,47 @@ export function CanvasView({
   canvasRef: canvasRefProp,
 }: CanvasViewProps) {
   const id = useId();
-  const { tunnel, pixiDomEvents } = useRenderContext();
+  const { tunnel } = useRenderContext();
   const canvasRef = useRef<HTMLCanvasElement>(null!);
   useImperativeHandle(canvasRefProp, () => canvasRef.current);
   const containerRef = useRef<Container>(null!);
   const renderTargetRef = useRef<RenderTarget>(null!);
+
+  const dispatchEvent = usePixiEventDispatch({
+    containerRef,
+    canvasRef,
+  });
+
+  const computeEventPoint = (event: ReactPointerEvent | React.WheelEvent) => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return null;
+
+    const viewRect = container.hitArea as Rectangle;
+    if (!viewRect) return null;
+
+    const rect = canvas.isConnected
+      ? canvas.getBoundingClientRect()
+      : {
+          left: 0,
+          top: 0,
+          width: canvas.width,
+          height: canvas.height,
+        };
+
+    const viewport = mapClientToViewport(
+      event.clientX,
+      event.clientY,
+      rect,
+      viewRect,
+    );
+    return new Point(viewport.x, viewport.y);
+  };
+
+  const handleEvent = (event: ReactPointerEvent | React.WheelEvent) => {
+    const point = computeEventPoint(event);
+    dispatchEvent(event.nativeEvent, point);
+  };
 
   useEffect(
     () => () => {
@@ -127,8 +172,14 @@ export function CanvasView({
             WebkitUserSelect: "none",
             WebkitTouchCallout: "none",
           }}
-          // eslint-disable-next-line react-hooks/refs
-          {...pixiDomEvents?.bind(canvasRef, containerRef)}
+          onPointerDown={handleEvent}
+          onPointerUp={handleEvent}
+          onPointerMove={handleEvent}
+          onPointerOver={handleEvent}
+          onPointerOut={handleEvent}
+          onPointerLeave={handleEvent}
+          onPointerCancel={handleEvent}
+          onWheel={handleEvent}
         >
           {fallback}
         </canvas>
