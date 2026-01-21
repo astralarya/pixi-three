@@ -23,7 +23,6 @@ export function LandmarkPointer({
   lineWidth = 2,
   ...props
 }: LandmarkPointerProps & Omit<ComponentProps<"pixiGraphics">, "draw">) {
-  const size = useViewport();
   const graphicsRef = useRef<Graphics>(null);
 
   useTick(() => {
@@ -75,13 +74,7 @@ export function LandmarkPointer({
 
   return (
     <>
-      <pixiGraphics
-        ref={graphicsRef}
-        draw={() => {}}
-        width={size.width}
-        height={size.height}
-        {...props}
-      />
+      <pixiGraphics ref={graphicsRef} draw={() => {}} {...props} />
       <pixiContainer
         eventMode="static"
         onGlobalPointerMove={(e: { global: Point }) => {
