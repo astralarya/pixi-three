@@ -282,9 +282,8 @@ function PixiTextureInternal({
       mapUvToPixi(uv, _point);
     }
 
-    const point: Point | null = uv && testGuard ? _point : null;
-
-    const isOver = point !== null;
+    const isOver = !!(uv && testGuard);
+    const point: Point | null = isOver ? _point : null;
 
     // Dispatch to Pixi if we have a point OR if we were previously over
     // (to send null for proper pointer out/leave handling)
