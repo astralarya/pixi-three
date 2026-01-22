@@ -1,4 +1,4 @@
-import { BoxIcon, Github, LinkIcon } from "lucide-react";
+import { BoxIcon, Code2Icon, LinkIcon } from "lucide-react";
 import * as React from "react";
 
 import {
@@ -48,7 +48,7 @@ export function Frame({
                 rel="noopener noreferrer"
                 className="text-muted-foreground flex items-center gap-1 text-sm hover:underline"
               >
-                <Github className="h-4 w-4" />
+                <Code2Icon className="h-4 w-4" />
                 Source
               </a>
               <a
@@ -58,7 +58,7 @@ export function Frame({
                 className="text-muted-foreground flex items-center gap-1 text-sm hover:underline"
               >
                 <BoxIcon className="h-4 w-4" />
-                CodeSandbox
+                Sandbox
               </a>
             </div>
             {/* Mobile: dropdown menu */}
@@ -75,7 +75,7 @@ export function Frame({
                       rel="noopener noreferrer"
                       className="flex-row items-center gap-2"
                     >
-                      <Github className="h-4 w-4" />
+                      <Code2Icon className="h-4 w-4" />
                       Source
                     </NavigationMenuLink>
                     <NavigationMenuLink
