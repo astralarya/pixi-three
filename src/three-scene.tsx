@@ -268,15 +268,10 @@ function ThreeSceneSpriteInternal({
         height,
         eventMode: "static",
       });
-      x.texture = new Texture({
-        dynamic: true,
-        source: new ExternalSource({
-          label: "three-scene",
-        }),
-      });
       return x;
     })(),
   );
+  const spriteInit = useRef(false);
 
   useImperativeHandle(spriteRef, () => sprite.current, []);
 
@@ -287,8 +282,20 @@ function ThreeSceneSpriteInternal({
   }, [height, width]);
 
   function onTextureUpdate(texture: GPUTexture) {
-    sprite.current.texture.source.resource = texture;
-    sprite.current.texture.source.update();
+    if (!spriteInit.current) {
+      sprite.current.texture = new Texture({
+        dynamic: true,
+        source: new ExternalSource({
+          renderer: app.renderer,
+          resource: texture,
+          label: "three-scene",
+        }),
+      });
+      spriteInit.current = true;
+    } else {
+      sprite.current.texture.source.resource = texture;
+      sprite.current.texture.source.update();
+    }
     if (changedSize.current) {
       sprite.current.setSize(width, height);
       changedSize.current = false;
