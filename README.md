@@ -13,7 +13,7 @@ Integrate 3d objects into 2d scenes.
 ## Installation
 
 ```bash
-npm i @astralarium/pixi-three https://pkg.pr.new/pixijs/pixijs/pixi.js@9b40b8b @pixi/react @react-three/fiber three
+npm i @astralarium/pixi-three https://pkg.pr.new/pixijs/pixijs/pixi.js@11846 @pixi/react @react-three/fiber three
 ```
 
 ## Usage
