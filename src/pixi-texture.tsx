@@ -41,8 +41,8 @@ import { type Object3D, type TextureNode } from "three/webgpu";
 import {
   mapPixiToUv as mapPixiToUvUtil,
   mapUvToPixi as mapUvToPixiUtil,
-  mapUvToThree,
-  mapUvToThreeLocal,
+  traceUvToThree,
+  traceUvToThreeLocal,
 } from "./bijections";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
 import { useCanvasView } from "./canvas-view-context";
@@ -363,7 +363,7 @@ function PixiTextureInternal({
 
   const _uv = new Vector2();
 
-  function mapPixiToParentThreeLocal(point: Point) {
+  function tracePixiToParentThreeLocal(point: Point) {
     mapPixiToParentUv(point, _uv);
 
     // Get attached mesh and convert UV to local positions on mesh surface
@@ -372,10 +372,10 @@ function PixiTextureInternal({
       return [];
     }
 
-    return mapUvToThreeLocal(_uv, object);
+    return traceUvToThreeLocal(_uv, object);
   }
 
-  function mapPixiToParentThree(point: Point) {
+  function tracePixiToParentThree(point: Point) {
     mapPixiToParentUv(point, _uv);
 
     // Get attached mesh and convert UV to world positions
@@ -384,13 +384,13 @@ function PixiTextureInternal({
       return [];
     }
 
-    return mapUvToThree(_uv, object);
+    return traceUvToThree(_uv, object);
   }
 
   const _threeParent = new Vector3();
 
   function mapPixiToParentPixi(point: Point, out?: Point) {
-    const results = mapPixiToParentThree(point);
+    const results = tracePixiToParentThree(point);
     return results.map((result, i) => {
       const target = i === 0 && out ? out : new Point();
       _threeParent.copy(result.position);
@@ -400,7 +400,7 @@ function PixiTextureInternal({
   }
 
   function mapPixiToViewport(localPoint: Point, out?: Point) {
-    const results = mapPixiToParentThree(localPoint);
+    const results = tracePixiToParentThree(localPoint);
     return results.map((result, i) => {
       const target = i === 0 && out ? out : new Point();
       _threeParent.copy(result.position);
@@ -410,7 +410,7 @@ function PixiTextureInternal({
   }
 
   function mapPixiToClient(localPoint: Point, out?: Point) {
-    const results = mapPixiToParentThree(localPoint);
+    const results = tracePixiToParentThree(localPoint);
     return results.map((result, i) => {
       const target = i === 0 && out ? out : new Point();
       _threeParent.copy(result.position);
@@ -477,8 +477,8 @@ function PixiTextureInternal({
             hitTest,
             mapUvToPixi,
             mapPixiToParentUv,
-            mapPixiToParentThreeLocal,
-            mapPixiToParentThree,
+            tracePixiToParentThreeLocal,
+            tracePixiToParentThree,
             mapPixiToParentPixi,
             mapPixiToViewport,
             mapPixiToClient,

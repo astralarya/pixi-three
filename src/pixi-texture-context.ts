@@ -5,7 +5,7 @@ import { type Object3D, type Vector2 } from "three";
 import {
   mapPixiToUv as mapPixiToUvUtil,
   mapUvToPixi as mapUvToPixiUtil,
-  type UvToThreeResult,
+  type UvTrace,
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
 import { useCanvasView } from "./canvas-view-context";
@@ -42,13 +42,13 @@ export interface PixiTextureContextValue {
    * @param point - Pixi Point in texture space
    * @returns Array of results with position/normal in local mesh coords
    */
-  mapPixiToParentThreeLocal: (point: Point) => UvToThreeResult[];
+  tracePixiToParentThreeLocal: (point: Point) => UvTrace[];
   /**
    * Maps Pixi texture coordinates to world coordinates in the parent Three scene.
    * @param point - Pixi Point in texture space
    * @returns Array of results with position/normal in parent world coords
    */
-  mapPixiToParentThree: (point: Point) => UvToThreeResult[];
+  tracePixiToParentThree: (point: Point) => UvTrace[];
   /**
    * Maps Pixi texture coordinates to global Pixi parent coordinates.
    * Returns array of Points since UV can map to multiple mesh positions.
@@ -126,13 +126,13 @@ export interface PixiViewParentThreeContextValue {
    * @param point - Pixi Point in texture space
    * @returns Array of results with position/normal in local mesh coords
    */
-  mapPixiToParentThreeLocal: (point: Point) => UvToThreeResult[];
+  tracePixiToParentThreeLocal: (point: Point) => UvTrace[];
   /**
    * Maps Pixi texture coordinates to world coordinates in the parent Three scene.
    * @param point - Pixi Point in texture space
    * @returns Array of results with position/normal in parent world coords
    */
-  mapPixiToParentThree: (point: Point) => UvToThreeResult[];
+  tracePixiToParentThree: (point: Point) => UvTrace[];
   /**
    * Maps Pixi texture coordinates to global Pixi parent coordinates.
    * Returns array of Points since UV can map to multiple mesh positions.
@@ -239,8 +239,8 @@ export function usePixiViewContext(): PixiViewContextValue {
       mapClientToPixi: textureContext.mapClientToPixi,
       mapViewportToPixi: textureContext.mapViewportToPixi,
       parentThree: {
-        mapPixiToParentThreeLocal: textureContext.mapPixiToParentThreeLocal,
-        mapPixiToParentThree: textureContext.mapPixiToParentThree,
+        tracePixiToParentThreeLocal: textureContext.tracePixiToParentThreeLocal,
+        tracePixiToParentThree: textureContext.tracePixiToParentThree,
         mapPixiToParentPixi: textureContext.mapPixiToParentPixi,
       },
     };

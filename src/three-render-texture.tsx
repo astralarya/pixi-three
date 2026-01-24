@@ -38,8 +38,8 @@ import {
   mapPixiToNdc as mapPixiToNdcUtil,
   mapThreeToNdc,
   mapUvToNdc,
-  mapUvToThree,
-  mapUvToThreeLocal,
+  traceUvToThree,
+  traceUvToThreeLocal,
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
@@ -194,7 +194,7 @@ export function ThreeRenderTexture({
       return result;
     }
 
-    const results = mapUvToThreeLocal(_uv, object);
+    const results = traceUvToThreeLocal(_uv, object);
     if (results.length === 0) {
       // UV not on mesh surface, fallback
       result.copy(vec3);
@@ -217,7 +217,7 @@ export function ThreeRenderTexture({
       return result;
     }
 
-    const results = mapUvToThree(_uv, object);
+    const results = traceUvToThree(_uv, object);
     if (results.length === 0) {
       // UV not on mesh surface, fallback
       result.copy(vec3);

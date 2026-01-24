@@ -262,14 +262,13 @@ export function disposeUvBvh(geometry: BufferGeometry): void {
 }
 
 /**
- * Result of UV to Three.js coordinate mapping.
+ * UV trace to 3D coordinates.
  * @category bijection
  */
-export interface UvToThreeResult {
+export interface UvTrace {
   position: Vector3;
   normal: Vector3;
   faceIndex: number;
-  /** Barycentric coordinates within the triangle */
   barycentric: Vector3;
 }
 
@@ -285,15 +284,15 @@ const _uvPoint = new Vector3();
  * @param faceIndex - If provided, only check this specific triangle
  * @returns Array of matching results with position, normal, and faceIndex (all in local space)
  */
-export function mapUvToThreeLocal(
+export function traceUvToThreeLocal(
   uv: Vector2,
   mesh: Mesh,
   faceIndex?: number,
-): UvToThreeResult[] {
-  const results: UvToThreeResult[] = [];
+): UvTrace[] {
+  const results: UvTrace[] = [];
 
   if (faceIndex !== undefined) {
-    const result = checkTriangle(faceIndex, uv, mesh.geometry);
+    const result = traceTriangle(faceIndex, uv, mesh.geometry);
     if (result) {
       results.push(result);
     }
@@ -306,7 +305,7 @@ export function mapUvToThreeLocal(
   bvh.shapecast({
     intersectsBounds: (box) => box.containsPoint(_queryPoint),
     intersectsTriangle: (_tri, triFaceIndex) => {
-      const result = checkTriangle(triFaceIndex, uv, mesh.geometry);
+      const result = traceTriangle(triFaceIndex, uv, mesh.geometry);
       if (result) {
         results.push(result);
       }
@@ -326,12 +325,12 @@ export function mapUvToThreeLocal(
  * @param faceIndex - If provided, only check this specific triangle
  * @returns Array of matching results with position, normal, and faceIndex (all in world space)
  */
-export function mapUvToThree(
+export function traceUvToThree(
   uv: Vector2,
   mesh: Mesh,
   faceIndex?: number,
-): UvToThreeResult[] {
-  const localResults = mapUvToThreeLocal(uv, mesh, faceIndex);
+): UvTrace[] {
+  const localResults = traceUvToThreeLocal(uv, mesh, faceIndex);
 
   return localResults.map(({ position, normal, faceIndex, barycentric }) => {
     const worldPosition = position.clone();
@@ -355,11 +354,11 @@ const _bary = new Vector3();
 const _position = new Vector3();
 const _normal = new Vector3();
 
-function checkTriangle(
+function traceTriangle(
   faceIndex: number,
   uv: Vector2,
   geometry: BufferGeometry,
-): UvToThreeResult | null {
+): UvTrace | null {
   const uvAttr = geometry.getAttribute("uv");
   const posAttr = geometry.getAttribute("position");
   const normAttr = geometry.getAttribute("normal");

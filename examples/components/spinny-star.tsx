@@ -104,8 +104,8 @@ export function SpinnyStar({
           x: _point.current.x / size.width,
           y: _point.current.y / size.height,
         };
-        const star1World = parentThree.mapPixiToParentThree(_point.current);
-        const star1Local = parentThree.mapPixiToParentThreeLocal(
+        const star1World = parentThree.tracePixiToParentThree(_point.current);
+        const star1Local = parentThree.tracePixiToParentThreeLocal(
           _point.current,
         );
         for (let j = 0; j < star1World.length; j++) {
@@ -126,8 +126,8 @@ export function SpinnyStar({
           x: _point.current.x / size.width,
           y: _point.current.y / size.height,
         };
-        const star2World = parentThree.mapPixiToParentThree(_point.current);
-        const star2Local = parentThree.mapPixiToParentThreeLocal(
+        const star2World = parentThree.tracePixiToParentThree(_point.current);
+        const star2Local = parentThree.tracePixiToParentThreeLocal(
           _point.current,
         );
         for (let j = 0; j < star2World.length; j++) {
