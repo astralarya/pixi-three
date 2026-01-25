@@ -10,7 +10,7 @@ export * from "./pixi-texture-context";
 export * from "./render-context";
 export * from "./render-context-hooks";
 export * from "./three-fiber";
-export * from "./three-portal";
+export * from "./three-portal-content";
 export * from "./three-render-texture";
 export * from "./three-root";
 export * from "./three-scene";

@@ -56,7 +56,7 @@ import {
   usePixiViewContext,
 } from "./pixi-texture-context";
 import { useRenderContext } from "./render-context-hooks";
-import { PortalContent } from "./three-portal";
+import { PortalContent } from "./three-portal-content";
 import {
   type RaycastResult,
   ThreeSceneContext,

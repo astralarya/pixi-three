@@ -44,7 +44,7 @@ import {
 import { useViewport } from "./canvas-tree-context";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
 import { useAttachedObject } from "./three-fiber";
-import { PortalContent } from "./three-portal";
+import { PortalContent } from "./three-portal-content";
 import {
   type RaycastResult,
   ThreeSceneContext,
