@@ -20,7 +20,7 @@ import type WebGPUBackend from "three/src/renderers/webgpu/WebGPUBackend.js";
 import { type PostProcessing, type WebGPURenderer } from "three/webgpu";
 
 /** @internal */
-export interface PortalProps {
+export interface PortalContentProps {
   ref?: Ref<RenderTarget>;
   renderPriority: number;
   width: number;
@@ -39,7 +39,7 @@ export interface PortalProps {
 }
 
 /** @internal */
-export function Portal({
+export function PortalContent({
   ref,
   renderPriority,
   width,
@@ -52,7 +52,7 @@ export function Portal({
   frameloop = "always",
   isFrameRequested,
   signalFrame,
-}: PortalProps) {
+}: PortalContentProps) {
   const state = useThree();
   const backendData = (
     (state.gl as unknown as WebGPURenderer).backend as WebGPUBackend & {

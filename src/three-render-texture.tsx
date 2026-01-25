@@ -44,7 +44,7 @@ import {
 import { useViewport } from "./canvas-tree-context";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
 import { useAttachedObject } from "./three-fiber";
-import { Portal } from "./three-portal";
+import { PortalContent } from "./three-portal";
 import {
   type RaycastResult,
   ThreeSceneContext,
@@ -391,7 +391,7 @@ export function ThreeRenderTexture({
           }}
         >
           {createPortal(
-            <Portal
+            <PortalContent
               ref={(renderTarget: RenderTarget | null) => {
                 if (renderTarget) {
                   textureRef.current.value = renderTarget.texture;
@@ -410,7 +410,7 @@ export function ThreeRenderTexture({
               <sceneTunnel.Out />
               {/* Without an element that receives pointer events state.pointer will always be 0/0 */}
               <group onPointerOver={() => null} />
-            </Portal>,
+            </PortalContent>,
             scene,
 
             {
