@@ -268,34 +268,27 @@ function ThreeSceneSpriteInternal({
         height,
         eventMode: "static",
       });
+      x.texture = new Texture({
+        dynamic: true,
+        source: new ExternalSource({
+          renderer: app.renderer,
+          label: "three-scene",
+        }),
+      });
       return x;
     })(),
   );
-  const spriteInit = useRef(false);
 
   useImperativeHandle(spriteRef, () => sprite.current, []);
 
-  const changedSize = useRef(false);
+  const changedSize = useRef(true);
 
   useEffect(() => {
     changedSize.current = true;
   }, [height, width]);
 
   function onTextureUpdate(texture: GPUTexture) {
-    if (!spriteInit.current) {
-      sprite.current.texture = new Texture({
-        dynamic: true,
-        source: new ExternalSource({
-          renderer: app.renderer,
-          resource: texture,
-          label: "three-scene",
-        }),
-      });
-      spriteInit.current = true;
-    } else {
-      sprite.current.texture.source.resource = texture;
-      sprite.current.texture.source.update();
-    }
+    (sprite.current.texture.source as ExternalSource).updateGPUTexture(texture);
     if (changedSize.current) {
       sprite.current.setSize(width, height);
       changedSize.current = false;
