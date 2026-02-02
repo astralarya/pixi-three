@@ -74,7 +74,7 @@
     "globals": "^17.0.0",
     "its-fine": "^2.0.0",
     "lucide-react": "^0.562.0",
-    "pixi.js": "https://pkg.pr.new/pixijs/pixijs/pixi.js@11860",
+    "pixi.js": "https://pkg.pr.new/pixijs/pixijs/pixi.js@6692433",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "react": "^19.2.3",
