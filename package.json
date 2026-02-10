@@ -73,6 +73,7 @@
     "globals": "^17.0.0",
     "its-fine": "^2.0.0",
     "lucide-react": "^0.562.0",
+    "pixi.js": "^8.16.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "react": "^19.2.3",
@@ -91,7 +92,6 @@
     "vite-tsconfig-paths": "^6.0.4"
   },
   "dependencies": {
-    "pixi.js": "https://pkg.pr.new/pixijs/pixijs/pixi.js@edd99f7",
     "three-mesh-bvh": "^0.9.7"
   }
 }
