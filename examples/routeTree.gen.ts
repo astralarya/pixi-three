@@ -16,6 +16,7 @@ import { Route as ExampleIndexRouteImport } from './routes/example/index'
 import { Route as ExampleVideoPreviewRouteImport } from './routes/example/video-preview'
 import { Route as ExampleUnmountContextRouteImport } from './routes/example/unmount-context'
 import { Route as ExampleThreeRenderTextureRouteImport } from './routes/example/three-render-texture'
+import { Route as ExampleThreePointerCaptureRouteImport } from './routes/example/three-pointer-capture'
 import { Route as ExampleDemandRenderingRouteImport } from './routes/example/demand-rendering'
 import { Route as ExampleBijectionsRouteImport } from './routes/example/bijections'
 import { Route as ExampleBasicSceneRouteImport } from './routes/example/basic-scene'
@@ -56,6 +57,12 @@ const ExampleThreeRenderTextureRoute =
     path: '/three-render-texture',
     getParentRoute: () => ExampleRoute,
   } as any)
+const ExampleThreePointerCaptureRoute =
+  ExampleThreePointerCaptureRouteImport.update({
+    id: '/three-pointer-capture',
+    path: '/three-pointer-capture',
+    getParentRoute: () => ExampleRoute,
+  } as any)
 const ExampleDemandRenderingRoute = ExampleDemandRenderingRouteImport.update({
   id: '/demand-rendering',
   path: '/demand-rendering',
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/example/basic-scene': typeof ExampleBasicSceneRoute
   '/example/bijections': typeof ExampleBijectionsRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
+  '/example/three-pointer-capture': typeof ExampleThreePointerCaptureRoute
   '/example/three-render-texture': typeof ExampleThreeRenderTextureRoute
   '/example/unmount-context': typeof ExampleUnmountContextRoute
   '/example/video-preview': typeof ExampleVideoPreviewRoute
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
   '/example/basic-scene': typeof ExampleBasicSceneRoute
   '/example/bijections': typeof ExampleBijectionsRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
+  '/example/three-pointer-capture': typeof ExampleThreePointerCaptureRoute
   '/example/three-render-texture': typeof ExampleThreeRenderTextureRoute
   '/example/unmount-context': typeof ExampleUnmountContextRoute
   '/example/video-preview': typeof ExampleVideoPreviewRoute
@@ -103,6 +112,7 @@ export interface FileRoutesById {
   '/example/basic-scene': typeof ExampleBasicSceneRoute
   '/example/bijections': typeof ExampleBijectionsRoute
   '/example/demand-rendering': typeof ExampleDemandRenderingRoute
+  '/example/three-pointer-capture': typeof ExampleThreePointerCaptureRoute
   '/example/three-render-texture': typeof ExampleThreeRenderTextureRoute
   '/example/unmount-context': typeof ExampleUnmountContextRoute
   '/example/video-preview': typeof ExampleVideoPreviewRoute
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/example/basic-scene'
     | '/example/bijections'
     | '/example/demand-rendering'
+    | '/example/three-pointer-capture'
     | '/example/three-render-texture'
     | '/example/unmount-context'
     | '/example/video-preview'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/example/basic-scene'
     | '/example/bijections'
     | '/example/demand-rendering'
+    | '/example/three-pointer-capture'
     | '/example/three-render-texture'
     | '/example/unmount-context'
     | '/example/video-preview'
@@ -140,6 +152,7 @@ export interface FileRouteTypes {
     | '/example/basic-scene'
     | '/example/bijections'
     | '/example/demand-rendering'
+    | '/example/three-pointer-capture'
     | '/example/three-render-texture'
     | '/example/unmount-context'
     | '/example/video-preview'
@@ -203,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExampleThreeRenderTextureRouteImport
       parentRoute: typeof ExampleRoute
     }
+    '/example/three-pointer-capture': {
+      id: '/example/three-pointer-capture'
+      path: '/three-pointer-capture'
+      fullPath: '/example/three-pointer-capture'
+      preLoaderRoute: typeof ExampleThreePointerCaptureRouteImport
+      parentRoute: typeof ExampleRoute
+    }
     '/example/demand-rendering': {
       id: '/example/demand-rendering'
       path: '/demand-rendering'
@@ -231,6 +251,7 @@ interface ExampleRouteChildren {
   ExampleBasicSceneRoute: typeof ExampleBasicSceneRoute
   ExampleBijectionsRoute: typeof ExampleBijectionsRoute
   ExampleDemandRenderingRoute: typeof ExampleDemandRenderingRoute
+  ExampleThreePointerCaptureRoute: typeof ExampleThreePointerCaptureRoute
   ExampleThreeRenderTextureRoute: typeof ExampleThreeRenderTextureRoute
   ExampleUnmountContextRoute: typeof ExampleUnmountContextRoute
   ExampleVideoPreviewRoute: typeof ExampleVideoPreviewRoute
@@ -241,6 +262,7 @@ const ExampleRouteChildren: ExampleRouteChildren = {
   ExampleBasicSceneRoute: ExampleBasicSceneRoute,
   ExampleBijectionsRoute: ExampleBijectionsRoute,
   ExampleDemandRenderingRoute: ExampleDemandRenderingRoute,
+  ExampleThreePointerCaptureRoute: ExampleThreePointerCaptureRoute,
   ExampleThreeRenderTextureRoute: ExampleThreeRenderTextureRoute,
   ExampleUnmountContextRoute: ExampleUnmountContextRoute,
   ExampleVideoPreviewRoute: ExampleVideoPreviewRoute,

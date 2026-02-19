@@ -29,6 +29,11 @@ export const EXAMPLES: readonly ExampleMeta[] = [
     description: "Three.js render texture with events",
   },
   {
+    label: "Three Pointer Capture",
+    to: "/example/three-pointer-capture",
+    description: "Drag meshes even when pointer leaves",
+  },
+  {
     label: "On-Demand Rendering",
     to: "/example/demand-rendering",
     description: "Save power on mobile devices",
