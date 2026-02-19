@@ -31,6 +31,7 @@ import {
   useState,
 } from "react";
 import {
+  Mesh,
   type Object3D,
   type Plane,
   Raycaster,
@@ -46,6 +47,7 @@ import {
   mapNdcToPixi as mapNdcToPixiUtil,
   mapPixiToNdc as mapPixiToNdcUtil,
   mapThreeToNdc,
+  projectRayToMeshPlaneIntersection,
 } from "./bijections";
 import { useViewport } from "./canvas-tree-context";
 import { CanvasTreeContext, useCanvasTreeStore } from "./canvas-tree-context";
@@ -306,7 +308,12 @@ function ThreeSceneSpriteInternal({
   const clientPos = new Point();
   const globalPos = new Point();
   const localPos = new Point();
+
   function computeFn(event: DomEvent, state: RootState, previous?: RootState) {
+    const pointerId = (event as PointerEvent).pointerId;
+    const isCaptured =
+      pointerId !== undefined && state.internal.capturedMap.has(pointerId);
+
     if (pixiTextureContext) {
       if (!previous) {
         return false;
@@ -316,7 +323,7 @@ function ThreeSceneSpriteInternal({
         previous,
         previous.previousRoot?.getState(),
       ) as void | false;
-      if (status === false) {
+      if (status === false && !isCaptured) {
         return false;
       }
       const parent = pixiTextureContext.getAttachedObject();
@@ -324,15 +331,22 @@ function ThreeSceneSpriteInternal({
         return false;
       }
       const [intersection] = previous?.raycaster.intersectObject(parent) ?? [];
-      if (!intersection) {
+      if (intersection?.uv) {
+        pixiTextureContext.mapUvToPixi(intersection.uv, globalPos);
+      } else if (isCaptured && parent instanceof Mesh) {
+        const extendedIntersection = projectRayToMeshPlaneIntersection(
+          previous.raycaster.ray,
+          parent,
+        );
+        if (!extendedIntersection?.uv) {
+          return false;
+        }
+        pixiTextureContext.mapUvToPixi(extendedIntersection.uv, globalPos);
+      } else {
         return false;
       }
-      const uv = intersection.uv;
-      if (!uv) {
-        return false;
-      }
-      pixiTextureContext.mapUvToPixi(uv, globalPos);
       if (
+        !isCaptured &&
         sprite.current !== pixiTextureContext.hitTest(globalPos.x, globalPos.y)
       ) {
         return false;
@@ -345,8 +359,9 @@ function ThreeSceneSpriteInternal({
       app.renderer.events.rootBoundary.rootTarget = canvasContainerRef.current;
       canvasContainerRef.current.toGlobal(clientPos, globalPos);
       if (
+        !isCaptured &&
         sprite.current !==
-        app.renderer.events.rootBoundary.hitTest(globalPos.x, globalPos.y)
+          app.renderer.events.rootBoundary.hitTest(globalPos.x, globalPos.y)
       ) {
         return false;
       }

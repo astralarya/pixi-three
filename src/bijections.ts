@@ -3,7 +3,10 @@ import {
   BufferGeometry,
   type Camera,
   Float32BufferAttribute,
+  type Intersection,
   type Mesh,
+  Plane,
+  type Ray,
   Triangle,
   Vector2,
   Vector3,
@@ -262,6 +265,36 @@ export function disposeUvBvh(geometry: BufferGeometry): void {
 }
 
 /**
+ * Gets or creates a position-space BVH for the given geometry.
+ *
+ * @category bijection
+ * @param geometry - The BufferGeometry for the BVH
+ * @returns The position-space MeshBVH
+ */
+export function getOrCreateBvh(geometry: BufferGeometry): MeshBVH {
+  if (geometry.boundsTree) {
+    // three-mesh-bvh types this as GeometryBVH, but for mesh geometry it's MeshBVH
+    return geometry.boundsTree as MeshBVH;
+  }
+  const bvh = new MeshBVH(geometry);
+  geometry.boundsTree = bvh;
+  return bvh;
+}
+
+/**
+ * Clears the cached position-space BVH from a geometry. Call this if positions change.
+ *
+ * @category bijection
+ * @param geometry - The BufferGeometry to clear the BVH from
+ */
+export function disposeBvh(geometry: BufferGeometry): void {
+  // Note: Unlike disposeUvBvh, we do NOT call geometry.dispose() here
+  // because the BVH references the original geometry, not a copy.
+  // We just clear the reference.
+  geometry.boundsTree = undefined;
+}
+
+/**
  * UV trace to 3D coordinates.
  * @category bijection
  */
@@ -427,4 +460,130 @@ export function mapThreeToNdc(
   result.x = _ndc.x;
   result.y = _ndc.y;
   return result;
+}
+
+const _localPoint = new Vector3();
+const _meshCenter = new Vector3();
+const _closestPoint = new Vector3();
+const _projTri = new Triangle();
+const _projTriPlane = new Plane();
+const _localRayOrigin = new Vector3();
+const _localRayDir = new Vector3();
+const _triPlaneIntersection = new Vector3();
+const _projBary = new Vector3();
+const _projUv = new Vector2();
+const _projWorldPoint = new Vector3();
+const _projUvResult = new Vector2();
+
+/**
+ * Project a ray onto a mesh plane and return an Intersection object.
+ *
+ * @category bijection
+ * @param ray - The ray to project
+ * @param mesh - The mesh to project onto
+ * @returns An Intersection object or null if projection fails
+ */
+export function projectRayToMeshPlaneIntersection(
+  ray: Ray,
+  mesh: Mesh,
+): Intersection | null {
+  const geometry = mesh.geometry;
+
+  const posAttr = geometry.getAttribute("position");
+  const index = geometry.index;
+  if (!posAttr || posAttr.count < 3) {
+    return null;
+  }
+
+  const uvAttr = geometry.getAttribute("uv");
+  if (!uvAttr) {
+    return null;
+  }
+
+  // Get mesh center in world space
+  if (!geometry.boundingSphere) {
+    geometry.computeBoundingSphere();
+  }
+  _meshCenter.copy(geometry.boundingSphere!.center);
+  mesh.localToWorld(_meshCenter);
+
+  // Project mesh center onto ray to get a query point in the direction we're looking
+  // This ensures we find a triangle the ray is pointing at, not just the closest to camera
+  const projT = ray.direction.dot(_meshCenter.sub(ray.origin));
+  ray.at(Math.max(0, projT), _localPoint);
+  mesh.worldToLocal(_localPoint);
+
+  // Find closest triangle using BVH acceleration
+  const bvh = getOrCreateBvh(geometry);
+  const hitInfo = { point: _closestPoint, distance: 0, faceIndex: 0 };
+  const closestResult = bvh.closestPointToPoint(_localPoint, hitInfo);
+
+  if (!closestResult) {
+    return null;
+  }
+
+  const faceIndex = hitInfo.faceIndex;
+
+  // Get vertex indices for the closest triangle
+  const idx0 = index ? index.getX(faceIndex * 3) : faceIndex * 3;
+  const idx1 = index ? index.getX(faceIndex * 3 + 1) : faceIndex * 3 + 1;
+  const idx2 = index ? index.getX(faceIndex * 3 + 2) : faceIndex * 3 + 2;
+
+  // Build triangle
+  _projTri.a.set(posAttr.getX(idx0), posAttr.getY(idx0), posAttr.getZ(idx0));
+  _projTri.b.set(posAttr.getX(idx1), posAttr.getY(idx1), posAttr.getZ(idx1));
+  _projTri.c.set(posAttr.getX(idx2), posAttr.getY(idx2), posAttr.getZ(idx2));
+
+  // Get the plane coplanar with the triangle
+  _projTri.getPlane(_projTriPlane);
+
+  // Transform ray to local space
+  _localRayOrigin.copy(ray.origin);
+  mesh.worldToLocal(_localRayOrigin);
+  _localRayDir.copy(ray.direction);
+  // Transform direction (don't translate, just rotate/scale)
+  _localRayDir.transformDirection(mesh.matrixWorld.clone().invert());
+
+  // Intersect the local ray with the triangle's plane
+  const t = _projTriPlane.distanceToPoint(_localRayOrigin);
+  const denom = _projTriPlane.normal.dot(_localRayDir);
+  if (Math.abs(denom) < 1e-10) {
+    // Ray is parallel to the plane, fall back to closest point
+    _triPlaneIntersection.copy(_closestPoint);
+  } else {
+    const rayT = -t / denom;
+    _triPlaneIntersection
+      .copy(_localRayDir)
+      .multiplyScalar(rayT)
+      .add(_localRayOrigin);
+  }
+
+  // Compute barycentric coords using the triangle plane intersection
+  _projTri.getBarycoord(_triPlaneIntersection, _projBary);
+
+  // Interpolate UV using barycentric coordinates
+  Triangle.getInterpolatedAttribute(
+    uvAttr,
+    idx0,
+    idx1,
+    idx2,
+    _projBary,
+    _projUv,
+  );
+  _projUvResult.set(_projUv.x, _projUv.y);
+
+  // Convert triangle plane intersection to world coordinates
+  _projWorldPoint.copy(_triPlaneIntersection);
+  mesh.localToWorld(_projWorldPoint);
+
+  // Compute distance from ray origin
+  const distance = ray.origin.distanceTo(_projWorldPoint);
+
+  return {
+    distance,
+    point: _projWorldPoint.clone(),
+    object: mesh,
+    faceIndex,
+    uv: _projUvResult.clone(),
+  };
 }
